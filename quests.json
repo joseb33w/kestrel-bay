@@ -12,7 +12,7 @@
       "type": "talk_to",
       "target": "harbour_master"
      },
-     "desc": "Find the Harbour Master in his office on the quay"
+     "desc": "Find Alwyn at the harbour office"
     },
     {
      "id": "pub",
@@ -20,7 +20,7 @@
       "type": "talk_to",
       "target": "barmaid"
      },
-     "desc": "Climb to the town and ask at the Kestrel Arms"
+     "desc": "Ask at the Kestrel Arms up the hill"
     }
    ],
    "rewards": {
@@ -46,7 +46,7 @@
       "type": "reach_area",
       "target": "c9_-6"
      },
-     "desc": "Get down the coast to the wreck (boat, or the cliff path)"
+     "desc": "Reach the wreck down the coast"
     },
     {
      "id": "gun",
@@ -54,16 +54,16 @@
       "type": "collect",
       "target": "shotgun"
      },
-     "desc": "Search the wreck for something better than a boat hook"
+     "desc": "Take the shotgun from the stash by the wreck"
     },
     {
      "id": "clear",
      "objective": {
       "type": "kill_count",
       "target": "smuggler",
-      "count": 8
+      "count": 5
      },
-     "desc": "Deal with the 8 smugglers"
+     "desc": "Deal with the 5 smugglers"
     },
     {
      "id": "boss",
@@ -72,7 +72,7 @@
       "target": "ringleader",
       "count": 1
      },
-     "desc": "Take down the ringleader in the caves"
+     "desc": "Take down the ringleader"
     },
     {
      "id": "loot",

@@ -161,7 +161,9 @@ func add_npc(pos: Vector3, npc_id: String, npc_name: String, persona: String, li
 		# SEAT the character so feet rest on the floor. Character GLB origins sit at the hips, so the
 		# model sinks to the knees unless we LIFT it (unlike props, which we only ever drop). This is
 		# the NPC-side of the player's _seat_avatar — full seat, both lift and drop, no maxf clamp.
-		m3.position.y -= _subtree_aabb(m3).position.y
+		# _subtree_aabb is WORLD-space, so subtract the model's own world height first — otherwise the
+		# feet land at world y=0 regardless of `pos` (fine on a flat zone floor, buried on terrain).
+		m3.position.y -= _subtree_aabb(m3).position.y - m3.global_position.y
 		_idle_animate(m3)
 	else:
 		_capsule(pos, Color(0.30, 0.78, 0.42), par)

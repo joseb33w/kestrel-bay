@@ -688,13 +688,6 @@
     "sill": 0
    },
    {
-    "face": "n",
-    "centre": 6.0,
-    "w": 1.1,
-    "h": 2.1,
-    "sill": 0
-   },
-   {
     "face": "s",
     "centre": -4.5,
     "w": 0.9,
@@ -772,353 +765,7 @@
     "sill": 3.6
    }
   ],
-  "notes": "ENTERABLE, two ways out. Tall single-volume timber hall, 5.5 m to the eaves, slate gable ridge along the long (x) axis. Wide double door (one leaf with a centre stile) on s face centre 0, 2.4 x 2.5 m; normal door on n face centre +6.0 (1.1 x 2.1 m). Open hall 17.3 x 9.3 m, no rooms, no stair. High clerestory windows at sill 3.6 on all four faces. Sole-plate course at the base, eaves board at 5.15 m."
- },
- {
-  "id": "chapel",
-  "footprint": [
-   20,
-   26
-  ],
-  "floors": 1,
-  "floor_height": 8.0,
-  "wall_t": 0.45,
-  "material": "stone",
-  "roof_material": "slate",
-  "collider": "mesh",
-  "interior": {
-   "floor_z": 0.2
-  },
-  "parts": [
-   {
-    "name": "tower",
-    "footprint": [
-     6,
-     6
-    ],
-    "at": [
-     0,
-     10
-    ],
-    "profile": "vertical",
-    "height": 15.0,
-    "floors": 4,
-    "floor_height": 3.75,
-    "cap": "spire",
-    "roof_height": 2.3,
-    "roof_material": "slate",
-    "courses": [
-     {
-      "projection": 0.2,
-      "z": 14.4,
-      "h": 0.45
-     }
-    ]
-   },
-   {
-    "name": "nave",
-    "footprint": [
-     9,
-     18
-    ],
-    "at": [
-     0,
-     0
-    ],
-    "profile": "vertical",
-    "height": 8.0,
-    "floors": 1,
-    "floor_height": 8.0,
-    "cap": "gable",
-    "ridge_axis": "y",
-    "roof_height": 3.2
-   },
-   {
-    "name": "transept",
-    "footprint": [
-     20,
-     5.6
-    ],
-    "at": [
-     0,
-     -3.8
-    ],
-    "profile": "vertical",
-    "height": 8.0,
-    "floors": 1,
-    "floor_height": 8.0,
-    "cap": "gable",
-    "ridge_axis": "x",
-    "roof_height": 2.4
-   },
-   {
-    "name": "apse",
-    "footprint": [
-     6.4,
-     6.4
-    ],
-    "at": [
-     0,
-     -10
-    ],
-    "profile": "vertical",
-    "plan": {
-     "shape": "polygon",
-     "sides": 6
-    },
-    "height": 7.0,
-    "floors": 1,
-    "floor_height": 7.0,
-    "cap": "hip",
-    "roof_material": "slate",
-    "roof_height": 2.0
-   }
-  ],
-  "openings": [
-   {
-    "part": "tower",
-    "face": "s",
-    "centre": 0,
-    "w": 1.6,
-    "kind": "arch",
-    "springing": 1.7,
-    "radius": 0.8,
-    "sill": 0
-   },
-   {
-    "part": "tower",
-    "face": "s",
-    "centre": 0,
-    "w": 0.8,
-    "h": 1.4,
-    "sill": 5.0
-   },
-   {
-    "part": "tower",
-    "face": "s",
-    "centre": 0,
-    "w": 0.8,
-    "h": 1.4,
-    "sill": 8.6
-   },
-   {
-    "part": "tower",
-    "face": "e",
-    "centre": 0,
-    "w": 0.8,
-    "h": 1.4,
-    "sill": 5.0
-   },
-   {
-    "part": "tower",
-    "face": "w",
-    "centre": 0,
-    "w": 0.8,
-    "h": 1.4,
-    "sill": 8.6
-   },
-   {
-    "part": "tower",
-    "face": "s",
-    "centre": 0,
-    "w": 1.2,
-    "kind": "arch",
-    "springing": 1.5,
-    "radius": 0.6,
-    "sill": 11.9
-   },
-   {
-    "part": "tower",
-    "face": "n",
-    "centre": 0,
-    "w": 1.2,
-    "kind": "arch",
-    "springing": 1.5,
-    "radius": 0.6,
-    "sill": 11.9
-   },
-   {
-    "part": "tower",
-    "face": "e",
-    "centre": 0,
-    "w": 1.2,
-    "kind": "arch",
-    "springing": 1.5,
-    "radius": 0.6,
-    "sill": 11.9
-   },
-   {
-    "part": "tower",
-    "face": "w",
-    "centre": 0,
-    "w": 1.2,
-    "kind": "arch",
-    "springing": 1.5,
-    "radius": 0.6,
-    "sill": 11.9
-   },
-   {
-    "part": "nave",
-    "face": "e",
-    "centre": 1.5,
-    "w": 1.0,
-    "kind": "arch",
-    "springing": 2.4,
-    "radius": 0.5,
-    "sill": 2.2
-   },
-   {
-    "part": "nave",
-    "face": "e",
-    "centre": 4.5,
-    "w": 1.0,
-    "kind": "arch",
-    "springing": 2.4,
-    "radius": 0.5,
-    "sill": 2.2
-   },
-   {
-    "part": "nave",
-    "face": "e",
-    "centre": 7.5,
-    "w": 1.0,
-    "kind": "arch",
-    "springing": 2.4,
-    "radius": 0.5,
-    "sill": 2.2
-   },
-   {
-    "part": "nave",
-    "face": "e",
-    "centre": -7.8,
-    "w": 1.0,
-    "kind": "arch",
-    "springing": 2.4,
-    "radius": 0.5,
-    "sill": 2.2
-   },
-   {
-    "part": "nave",
-    "face": "w",
-    "centre": 1.5,
-    "w": 1.0,
-    "kind": "arch",
-    "springing": 2.4,
-    "radius": 0.5,
-    "sill": 2.2
-   },
-   {
-    "part": "nave",
-    "face": "w",
-    "centre": 4.5,
-    "w": 1.0,
-    "kind": "arch",
-    "springing": 2.4,
-    "radius": 0.5,
-    "sill": 2.2
-   },
-   {
-    "part": "nave",
-    "face": "w",
-    "centre": 7.5,
-    "w": 1.0,
-    "kind": "arch",
-    "springing": 2.4,
-    "radius": 0.5,
-    "sill": 2.2
-   },
-   {
-    "part": "nave",
-    "face": "w",
-    "centre": -7.8,
-    "w": 1.0,
-    "kind": "arch",
-    "springing": 2.4,
-    "radius": 0.5,
-    "sill": 2.2
-   },
-   {
-    "part": "transept",
-    "face": "e",
-    "centre": 0,
-    "w": 1.6,
-    "kind": "arch",
-    "springing": 2.6,
-    "radius": 0.8,
-    "sill": 1.6
-   },
-   {
-    "part": "transept",
-    "face": "w",
-    "centre": 0,
-    "w": 1.6,
-    "kind": "arch",
-    "springing": 2.6,
-    "radius": 0.8,
-    "sill": 1.6
-   },
-   {
-    "part": "transept",
-    "face": "s",
-    "centre": -7.5,
-    "w": 1.0,
-    "kind": "arch",
-    "springing": 2.4,
-    "radius": 0.5,
-    "sill": 2.2
-   },
-   {
-    "part": "transept",
-    "face": "s",
-    "centre": 7.5,
-    "w": 1.0,
-    "kind": "arch",
-    "springing": 2.4,
-    "radius": 0.5,
-    "sill": 2.2
-   },
-   {
-    "part": "transept",
-    "face": "n",
-    "centre": -7.5,
-    "w": 1.0,
-    "kind": "arch",
-    "springing": 2.4,
-    "radius": 0.5,
-    "sill": 2.2
-   },
-   {
-    "part": "transept",
-    "face": "n",
-    "centre": 7.5,
-    "w": 1.0,
-    "kind": "arch",
-    "springing": 2.4,
-    "radius": 0.5,
-    "sill": 2.2
-   },
-   {
-    "part": "apse",
-    "face": "n",
-    "centre": -0.8,
-    "w": 0.7,
-    "kind": "arch",
-    "springing": 2.2,
-    "radius": 0.35,
-    "sill": 1.8
-   },
-   {
-    "part": "apse",
-    "face": "n",
-    "centre": 0.8,
-    "w": 0.7,
-    "kind": "arch",
-    "springing": 2.2,
-    "radius": 0.35,
-    "sill": 1.8
-   }
-  ],
-  "notes": "ENTERABLE. Four masses in one connected interior: bell tower 6 x 6 m at the FRONT (Mason's s face is model +Y, so the tower sits at at:[0,+10] to land on the Godot -Z end), nave 9 x 18 m (8 m eaves, slate gable ridge along y), transept 20 x 5.6 m, hexagonal chancel/apse 6.4 m across under a slate hip at the back (hexagonal rather than the round dome: a tessellated dome alone costs ~1.1k collision triangles; the hex sits its flat face against the nave). Way in: arched double door (1.6 m wide, 1.7 m springing + 0.8 m radius = 2.5 m head, arch-headed timber leaf) in the tower's s face, centre 0. Tower/nave masses overlap 2.0 m (>= 2 x 0.45), so the tower's ground floor opens straight into the nave through a 5.1 m wide junction; nave/transept overlap fully, nave/apse 1.8 m (chancel throat ~2.7-3.7 m wide). Only the tower has storeys: 4 x 3.75 m (floors at 0.2/3.95/7.7/11.45), auto-sited alternating flights against the tower's e wall (x +1.865, then +0.315) climbing away from the door (foot at y +12.1, i.e. 0.9 m inside the door), bell chamber at the top with arched openings on all four faces at 11.9-14.0 m. The nave, transept and apse are one tall room (8 m). Tower slabs at 3.95 and 7.7 m protrude ~1.1 m into the nave's west end as a gallery ledge (same behaviour as mason.md's minster). No plinth on the chapel on purpose: a plinth/cornice ring on an overlapping part would run across the junction as a 0.6 m curb the step-assist cannot climb; only the tower gets a cornice at 14.4 m, above every junction. Structure-level floors is 1 (the nave); the tower part declares its own 4 and the manifest reports floors_built 4. Collision shell is ~2.1k tris, over the 1.5k soft budget: ~1k of that is the spire (a lofted apex tessellates finely); accepted for the hill landmark."
+  "notes": "ENTERABLE, two ways out. Tall single-volume timber hall, 5.5 m to the eaves, slate gable ridge along the long (x) axis. Wide double door (one leaf with a centre stile) on s face centre 0, 2.4 x 2.5 m; normal door on n face centre +6.0 (1.1 x 2.1 m). Open hall 17.3 x 9.3 m, no rooms, no stair. High clerestory windows at sill 3.6 on all four faces. Sole-plate course at the base, eaves board at 5.15 m. Quay-side door removed (downhill face sits 2.5 m above the quay)."
  },
  {
   "id": "house_e",
@@ -1296,11 +943,11 @@
   "floors": 1,
   "floor_height": 4.6,
   "wall_t": 0.4,
-  "material": "metal",
-  "roof_material": "metal",
+  "material": "timber",
+  "roof_material": "timber",
   "collider": "mesh",
   "interior": {
-   "floor_z": 0.2
+   "floor_z": 0.05
   },
   "parts": [
    {
@@ -1323,8 +970,8 @@
     "floor_height": 4.6,
     "cap": "flat",
     "roof_slab": 0.3,
-    "material": "metal",
-    "roof_material": "metal",
+    "material": "timber",
+    "roof_material": "timber",
     "courses": [
      {
       "projection": 0.12,
@@ -1389,8 +1036,8 @@
     "floor_height": 12.0,
     "cap": "flat",
     "roof_slab": 0.1,
-    "material": "metal",
-    "roof_material": "metal",
+    "material": "timber",
+    "roof_material": "timber",
     "interior": false
    }
   ],
@@ -1493,7 +1140,7 @@
     "sill": 7.9
    }
   ],
-  "notes": "ENTERABLE (the hold). The footprint [24,8] puts the hull's long axis along x, so the pointed ends are the e/w faces and the 24 m sides are s/n; the hexagon plan (sides 6, clipped to the box) gives a pointed bow at x -12 and stern at x +12 with flat sides at y +-4 between x +-9.7. Way in: a torn-open gash in the hull's s (landward) SIDE, centre x -3.0, 1.6 x 2.3 m, sill 0, no leaf. Hold = one open space 23 x 7 m under the deck (deck slab 4.6-4.9 m), floor at z 0.2, no stair. Superstructure is SOLID (interior:false) and sealed: a full-beam deckhouse 5 x 8 m at x +7 (2.3 m above deck) with a 3.6 x 4.6 m wheelhouse on top (to 9.6 m), recessed window panels on all faces; full-beam rather than the requested [5,4.5] because a narrower deckhouse standing only on the deck slab is a DISCONNECTED body (the hold void carves everything under the deck) - spanning the hull's side walls is what fuses it to the hull. Mast 0.9 x 0.9 m, 12 m tall, rooted in the solid bow point at x -11.4 for the same connectivity reason. Gunwale band at 4.1 m. Place with rot so the s face is landward."
+  "notes": "ENTERABLE (the hold). The footprint [24,8] puts the hull's long axis along x, so the pointed ends are the e/w faces and the 24 m sides are s/n; the hexagon plan (sides 6, clipped to the box) gives a pointed bow at x -12 and stern at x +12 with flat sides at y +-4 between x +-9.7. Way in: a torn-open gash in the hull's s (landward) SIDE, centre x -3.0, 1.6 x 2.3 m, sill 0, no leaf. Hold = one open space 23 x 7 m under the deck (deck slab 4.6-4.9 m), floor at z 0.2, no stair. Superstructure is SOLID (interior:false) and sealed: a full-beam deckhouse 5 x 8 m at x +7 (2.3 m above deck) with a 3.6 x 4.6 m wheelhouse on top (to 9.6 m), recessed window panels on all faces; full-beam rather than the requested [5,4.5] because a narrower deckhouse standing only on the deck slab is a DISCONNECTED body (the hold void carves everything under the deck) - spanning the hull's side walls is what fuses it to the hull. Mast 0.9 x 0.9 m, 12 m tall, rooted in the solid bow point at x -11.4 for the same connectivity reason. Gunwale band at 4.1 m. Place with rot so the s face is landward. Hull re-materialled to weathered TIMBER (a wooden trawler) with a metal deckhouse/wheelhouse so it reads as a wreck, not a grey box."
  },
  {
   "id": "sea_caves",
@@ -1508,7 +1155,7 @@
   "roof_material": "stone",
   "collider": "mesh",
   "interior": {
-   "floor_z": 0.2
+   "floor_z": 0.05
   },
   "parts": [
    {
@@ -2617,5 +2264,176 @@
    }
   ],
   "notes": "SEALED. Tall timber boathouse, 4.5 m eaves, slate gable ridge along x; the 2.4 x 2.6 m boat door on s is a blind niche 0.14 m deep (shut), high small windows all round."
+ },
+ {
+  "id": "chapel",
+  "footprint": [
+   9,
+   20
+  ],
+  "floors": 1,
+  "floor_height": 7.0,
+  "wall_t": 0.5,
+  "material": "stone",
+  "roof_material": "slate",
+  "cap": "gable",
+  "ridge_axis": "y",
+  "roof_height": 3.2,
+  "collider": "mesh",
+  "interior": {
+   "floor_z": 0.2
+  },
+  "plinth": {
+   "projection": 0.12,
+   "top_z": 0.6,
+   "chamfer": 0.06
+  },
+  "openings": [
+   {
+    "face": "s",
+    "centre": 0,
+    "w": 1.6,
+    "kind": "arch",
+    "springing": 1.75,
+    "radius": 0.8,
+    "sill": 0
+   },
+   {
+    "face": "e",
+    "centre": -6.5,
+    "w": 0.9,
+    "kind": "arch",
+    "springing": 3.4,
+    "radius": 0.45,
+    "sill": 2.0
+   },
+   {
+    "face": "e",
+    "centre": -2.2,
+    "w": 0.9,
+    "kind": "arch",
+    "springing": 3.4,
+    "radius": 0.45,
+    "sill": 2.0
+   },
+   {
+    "face": "e",
+    "centre": 2.2,
+    "w": 0.9,
+    "kind": "arch",
+    "springing": 3.4,
+    "radius": 0.45,
+    "sill": 2.0
+   },
+   {
+    "face": "e",
+    "centre": 6.5,
+    "w": 0.9,
+    "kind": "arch",
+    "springing": 3.4,
+    "radius": 0.45,
+    "sill": 2.0
+   },
+   {
+    "face": "w",
+    "centre": -6.5,
+    "w": 0.9,
+    "kind": "arch",
+    "springing": 3.4,
+    "radius": 0.45,
+    "sill": 2.0
+   },
+   {
+    "face": "w",
+    "centre": -2.2,
+    "w": 0.9,
+    "kind": "arch",
+    "springing": 3.4,
+    "radius": 0.45,
+    "sill": 2.0
+   },
+   {
+    "face": "w",
+    "centre": 2.2,
+    "w": 0.9,
+    "kind": "arch",
+    "springing": 3.4,
+    "radius": 0.45,
+    "sill": 2.0
+   },
+   {
+    "face": "w",
+    "centre": 6.5,
+    "w": 0.9,
+    "kind": "arch",
+    "springing": 3.4,
+    "radius": 0.45,
+    "sill": 2.0
+   },
+   {
+    "face": "n",
+    "centre": 0,
+    "w": 1.4,
+    "kind": "arch",
+    "springing": 3.6,
+    "radius": 0.7,
+    "sill": 2.2
+   }
+  ],
+  "notes": "Single-mass nave (the multi-part composition sealed its own doorway in QA). Arched west door, arched windows, slate gable. The bell tower is the separate solid type bell_tower placed touching its north end."
+ },
+ {
+  "id": "bell_tower",
+  "footprint": [
+   5,
+   5
+  ],
+  "floors": 1,
+  "height": 15.0,
+  "wall_t": 0.5,
+  "material": "stone",
+  "roof_material": "slate",
+  "cap": "spire",
+  "roof_height": 5.0,
+  "collider": "mesh",
+  "openings": [
+   {
+    "face": "s",
+    "centre": 0,
+    "w": 0.9,
+    "kind": "arch",
+    "springing": 10.6,
+    "radius": 0.45,
+    "sill": 10.0
+   },
+   {
+    "face": "n",
+    "centre": 0,
+    "w": 0.9,
+    "kind": "arch",
+    "springing": 10.6,
+    "radius": 0.45,
+    "sill": 10.0
+   },
+   {
+    "face": "e",
+    "centre": 0,
+    "w": 0.9,
+    "kind": "arch",
+    "springing": 10.6,
+    "radius": 0.45,
+    "sill": 10.0
+   },
+   {
+    "face": "w",
+    "centre": 0,
+    "w": 0.9,
+    "kind": "arch",
+    "springing": 10.6,
+    "radius": 0.45,
+    "sill": 10.0
+   }
+  ],
+  "notes": "Solid bell tower (no interior, no way in) standing against the nave's north gable."
  }
 ]
