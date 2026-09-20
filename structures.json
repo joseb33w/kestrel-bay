@@ -1,0 +1,2621 @@
+[
+ {
+  "id": "lighthouse",
+  "footprint": [
+   8,
+   8
+  ],
+  "floors": 6,
+  "floor_height": 3.4,
+  "wall_t": 0.4,
+  "material": "plaster",
+  "roof_material": "metal",
+  "collider": "mesh",
+  "interior": {
+   "floor_z": 0.2,
+   "stair": {
+    "cx": 0.625,
+    "cy": 0.0,
+    "width": 0.95,
+    "riser": 0.2125,
+    "tread": 0.24,
+    "axis": "y",
+    "rise": "back"
+   }
+  },
+  "parts": [
+   {
+    "name": "tower",
+    "footprint": [
+     8,
+     8
+    ],
+    "at": [
+     0,
+     0
+    ],
+    "plan": {
+     "shape": "round"
+    },
+    "profile": "taper",
+    "shrink": 0.2,
+    "height": 21.0,
+    "floors": 6,
+    "floor_height": 3.4,
+    "cap": "flat",
+    "roof_slab": 0.3,
+    "material": "plaster",
+    "roof_material": "plaster",
+    "courses": [
+     {
+      "projection": 0.15,
+      "z": 0.0,
+      "h": 0.7
+     },
+     {
+      "projection": 0.08,
+      "z": 10.3,
+      "h": 0.25
+     },
+     {
+      "projection": 0.7,
+      "z": 20.3,
+      "h": 0.5
+     }
+    ]
+   },
+   {
+    "name": "lantern",
+    "footprint": [
+     6,
+     6
+    ],
+    "at": [
+     0,
+     0
+    ],
+    "plan": {
+     "shape": "round"
+    },
+    "profile": "vertical",
+    "height": 24.6,
+    "floors": 1,
+    "floor_height": 3.4,
+    "cap": "pyramid",
+    "roof_height": 2.2,
+    "material": "plaster",
+    "roof_material": "metal",
+    "courses": [
+     {
+      "projection": 0.12,
+      "z": 24.1,
+      "h": 0.35
+     }
+    ]
+   }
+  ],
+  "openings": [
+   {
+    "part": "tower",
+    "face": "s",
+    "centre": 0,
+    "w": 1.1,
+    "h": 2.1,
+    "sill": 0
+   },
+   {
+    "part": "tower",
+    "face": "s",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 4.7
+   },
+   {
+    "part": "tower",
+    "face": "s",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 11.5
+   },
+   {
+    "part": "tower",
+    "face": "s",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 18.3
+   },
+   {
+    "part": "tower",
+    "face": "n",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 8.1
+   },
+   {
+    "part": "tower",
+    "face": "n",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 14.9
+   },
+   {
+    "part": "tower",
+    "face": "e",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 4.7
+   },
+   {
+    "part": "tower",
+    "face": "e",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 11.5
+   },
+   {
+    "part": "tower",
+    "face": "e",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 18.3
+   },
+   {
+    "part": "tower",
+    "face": "w",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 8.1
+   },
+   {
+    "part": "tower",
+    "face": "w",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 14.9
+   },
+   {
+    "part": "lantern",
+    "face": "s",
+    "centre": 0,
+    "w": 1.4,
+    "h": 1.8,
+    "sill": 21.7
+   },
+   {
+    "part": "lantern",
+    "face": "n",
+    "centre": 0,
+    "w": 1.4,
+    "h": 1.8,
+    "sill": 21.7
+   },
+   {
+    "part": "lantern",
+    "face": "e",
+    "centre": 0,
+    "w": 1.4,
+    "h": 1.8,
+    "sill": 21.7
+   },
+   {
+    "part": "lantern",
+    "face": "w",
+    "centre": 0,
+    "w": 1.4,
+    "h": 1.8,
+    "sill": 21.7
+   }
+  ],
+  "notes": "ENTERABLE. Round tapered plaster tower (8 m base -> 6.4 m at 21 m), 6 storeys of 3.4 m (floors at z 0.2/3.6/7.0/10.4/13.8/17.2), flat roof with a projecting gallery band at 20.3 m, and a 6 m round lantern drum rising through the roof to 24.6 m under a conical metal cap (tip ~26.8 m). Single timber door on the s face, centre 0, 1.1 x 2.1 m, sill 0. Stair is AUTHORED (the auto-siter could not fit a 4.6 m flight in the narrowing round plan and fell back to the axis, with alternate flights poking through the upper walls): five flights of 16 risers x 0.2125 m (tread 0.24, run 3.84 m, width 0.95), runs along y from y +1.9 (foot, 1.6 m inside the door) to y -1.9, climbing away from the door; flights alternate between x +0.625 (flights 1,3,5) and x -0.625 (2,4) so both stay >= 0.4 m inside the wall at the top storey. Every storey reached (floors_built 6 = declared 6). The top storey opens upward into the lantern drum (glazing 21.7-23.5 m, four faces) so the lamp room is visible from the top landing. Small windows alternate s/e (floors 2,4,6) and n/w (floors 3,5). Lantern is 'round' not octagonal because Mason's polygon puts vertices on the axes (every window would land on a corner). Round plan -> ~8.6k collision-shell tris: accepted for the one landmark, per mason.md."
+ },
+ {
+  "id": "pub",
+  "footprint": [
+   14,
+   10
+  ],
+  "floors": 2,
+  "floor_height": 3.2,
+  "wall_t": 0.45,
+  "material": "stone",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "interior": {
+   "floor_z": 0.2,
+   "stair": {
+    "cx": -6.0,
+    "cy": 0.8,
+    "width": 1.1,
+    "riser": 0.2,
+    "tread": 0.26,
+    "axis": "y",
+    "rise": "back",
+    "enclosure": true
+   }
+  },
+  "parts": [
+   {
+    "name": "main",
+    "footprint": [
+     14,
+     10
+    ],
+    "at": [
+     0,
+     0
+    ],
+    "profile": "vertical",
+    "height": 6.4,
+    "floors": 2,
+    "floor_height": 3.2,
+    "cap": "gable",
+    "ridge_axis": "x",
+    "roof_height": 3.0,
+    "courses": [
+     {
+      "projection": 0.12,
+      "z": 0.0,
+      "h": 0.6
+     },
+     {
+      "projection": 0.08,
+      "z": 3.35,
+      "h": 0.22
+     },
+     {
+      "projection": 0.22,
+      "z": 6.0,
+      "h": 0.4
+     }
+    ]
+   },
+   {
+    "name": "stack_e",
+    "footprint": [
+     0.9,
+     0.9
+    ],
+    "at": [
+     6.55,
+     1.5
+    ],
+    "profile": "vertical",
+    "height": 9.6,
+    "floors": 1,
+    "floor_height": 9.6,
+    "cap": "flat",
+    "roof_slab": 0.1,
+    "material": "stone",
+    "roof_material": "stone",
+    "interior": false
+   },
+   {
+    "name": "stack_w",
+    "footprint": [
+     0.9,
+     0.9
+    ],
+    "at": [
+     -6.55,
+     -1.5
+    ],
+    "profile": "vertical",
+    "height": 9.6,
+    "floors": 1,
+    "floor_height": 9.6,
+    "cap": "flat",
+    "roof_slab": 0.1,
+    "material": "stone",
+    "roof_material": "stone",
+    "interior": false
+   }
+  ],
+  "openings": [
+   {
+    "part": "main",
+    "face": "s",
+    "centre": 0,
+    "w": 1.2,
+    "h": 2.2,
+    "sill": 0
+   },
+   {
+    "part": "main",
+    "face": "n",
+    "centre": -4.0,
+    "w": 1.0,
+    "h": 2.1,
+    "sill": 0
+   },
+   {
+    "part": "main",
+    "face": "s",
+    "centre": -4.4,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "main",
+    "face": "s",
+    "centre": -2.4,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "main",
+    "face": "s",
+    "centre": 2.4,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "main",
+    "face": "s",
+    "centre": 4.4,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "main",
+    "face": "s",
+    "centre": -4.4,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   },
+   {
+    "part": "main",
+    "face": "s",
+    "centre": -2.4,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   },
+   {
+    "part": "main",
+    "face": "s",
+    "centre": 0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   },
+   {
+    "part": "main",
+    "face": "s",
+    "centre": 2.4,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   },
+   {
+    "part": "main",
+    "face": "s",
+    "centre": 4.4,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   },
+   {
+    "part": "main",
+    "face": "n",
+    "centre": 0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "main",
+    "face": "n",
+    "centre": 2.5,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "main",
+    "face": "n",
+    "centre": 5.0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "main",
+    "face": "n",
+    "centre": -4.0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   },
+   {
+    "part": "main",
+    "face": "n",
+    "centre": -1.5,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   },
+   {
+    "part": "main",
+    "face": "n",
+    "centre": 1.5,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   },
+   {
+    "part": "main",
+    "face": "n",
+    "centre": 4.5,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   },
+   {
+    "part": "main",
+    "face": "e",
+    "centre": -3.0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "main",
+    "face": "e",
+    "centre": 3.0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "main",
+    "face": "e",
+    "centre": -3.0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   },
+   {
+    "part": "main",
+    "face": "e",
+    "centre": 3.0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   },
+   {
+    "part": "main",
+    "face": "w",
+    "centre": -3.2,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "main",
+    "face": "w",
+    "centre": -3.0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   },
+   {
+    "part": "main",
+    "face": "w",
+    "centre": 3.0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 4.3
+   }
+  ],
+  "notes": "ENTERABLE, two ways out. Front door s face centre 0 (1.2 x 2.2 m, timber); back-yard door n face centre -4.0 (1.0 x 2.1 m). Stair: explicit, enclosed stair hall hard against the WEST wall (x -6.55..-5.45), run along y from y +2.9 (foot, nearest the front door) to y -1.3 (top), 16 risers of 0.20 m, rises away from the front door; the enclosure's own doorway faces the front wall with 1.5 m of standing room. Ground floor: everything east of x -5.4 is open; the back band y -4.55..-1.5 x x -3..+6.5 (3 x 9.5 m) is clear for the bar and a seated regular. Mason has no rooms/partition key, so UPSTAIRS is one open floor (13.1 x 9.1 m) with the stairwell + newel rail at the west end; furnish it as three rooms with prop partitions (suggested party walls at x -2.5 and x +2.5, corridor along the n wall). Two stone chimney stacks on the gable ends (e at y +1.5, w at y -1.5). Slate gable, ridge along x, 3.0 m rise; plinth course, first-floor string, cornice band."
+ },
+ {
+  "id": "harbour_office",
+  "footprint": [
+   9,
+   7
+  ],
+  "floors": 2,
+  "floor_height": 3.0,
+  "wall_t": 0.45,
+  "material": "stone",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "profile": "vertical",
+  "cap": "gable",
+  "ridge_axis": "x",
+  "roof_height": 2.2,
+  "courses": [
+   {
+    "projection": 0.12,
+    "z": 0.0,
+    "h": 0.6
+   },
+   {
+    "projection": 0.08,
+    "z": 3.15,
+    "h": 0.2
+   },
+   {
+    "projection": 0.2,
+    "z": 5.6,
+    "h": 0.4
+   }
+  ],
+  "interior": {
+   "floor_z": 0.2
+  },
+  "openings": [
+   {
+    "face": "s",
+    "centre": -2.2,
+    "w": 1.1,
+    "h": 2.1,
+    "sill": 0
+   },
+   {
+    "face": "s",
+    "centre": 1.6,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "face": "s",
+    "centre": -2.2,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 4.1
+   },
+   {
+    "face": "s",
+    "centre": 1.6,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 4.1
+   },
+   {
+    "face": "e",
+    "centre": 0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "face": "e",
+    "centre": 0,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 4.1
+   },
+   {
+    "face": "w",
+    "centre": 0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "face": "w",
+    "centre": 0,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 4.1
+   },
+   {
+    "face": "n",
+    "centre": -3.0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "face": "n",
+    "centre": 3.0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "face": "n",
+    "centre": -2.0,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 4.1
+   },
+   {
+    "face": "n",
+    "centre": 2.0,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 4.1
+   }
+  ],
+  "notes": "ENTERABLE. Door on s face centre -2.2 (1.1 x 2.1 m). Auto-sited stair: runs along x against the BACK (n) wall, rising away from the door; 2 storeys of 3.0 m (floors at z 0.2 and 3.2), upper office is one open room 8.1 x 6.1 m with the stairwell against the n wall. Slate gable ridge along x; plinth course, string course, cornice band."
+ },
+ {
+  "id": "net_shed",
+  "footprint": [
+   18,
+   10
+  ],
+  "floors": 1,
+  "floor_height": 5.5,
+  "wall_t": 0.35,
+  "material": "timber",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "profile": "vertical",
+  "cap": "gable",
+  "ridge_axis": "x",
+  "roof_height": 3.0,
+  "courses": [
+   {
+    "projection": 0.1,
+    "z": 0.0,
+    "h": 0.5
+   },
+   {
+    "projection": 0.15,
+    "z": 5.15,
+    "h": 0.35
+   }
+  ],
+  "interior": {
+   "floor_z": 0.2
+  },
+  "openings": [
+   {
+    "face": "s",
+    "centre": 0,
+    "w": 2.4,
+    "h": 2.5,
+    "sill": 0
+   },
+   {
+    "face": "n",
+    "centre": 6.0,
+    "w": 1.1,
+    "h": 2.1,
+    "sill": 0
+   },
+   {
+    "face": "s",
+    "centre": -4.5,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.6
+   },
+   {
+    "face": "s",
+    "centre": -7.5,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.6
+   },
+   {
+    "face": "s",
+    "centre": 4.5,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.6
+   },
+   {
+    "face": "s",
+    "centre": 7.5,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.6
+   },
+   {
+    "face": "n",
+    "centre": -6.0,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.6
+   },
+   {
+    "face": "n",
+    "centre": -2.0,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.6
+   },
+   {
+    "face": "n",
+    "centre": 2.0,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.6
+   },
+   {
+    "face": "e",
+    "centre": -2.5,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.6
+   },
+   {
+    "face": "e",
+    "centre": 2.5,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.6
+   },
+   {
+    "face": "w",
+    "centre": -2.5,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.6
+   },
+   {
+    "face": "w",
+    "centre": 2.5,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.6
+   }
+  ],
+  "notes": "ENTERABLE, two ways out. Tall single-volume timber hall, 5.5 m to the eaves, slate gable ridge along the long (x) axis. Wide double door (one leaf with a centre stile) on s face centre 0, 2.4 x 2.5 m; normal door on n face centre +6.0 (1.1 x 2.1 m). Open hall 17.3 x 9.3 m, no rooms, no stair. High clerestory windows at sill 3.6 on all four faces. Sole-plate course at the base, eaves board at 5.15 m."
+ },
+ {
+  "id": "chapel",
+  "footprint": [
+   20,
+   26
+  ],
+  "floors": 1,
+  "floor_height": 8.0,
+  "wall_t": 0.45,
+  "material": "stone",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "interior": {
+   "floor_z": 0.2
+  },
+  "parts": [
+   {
+    "name": "tower",
+    "footprint": [
+     6,
+     6
+    ],
+    "at": [
+     0,
+     10
+    ],
+    "profile": "vertical",
+    "height": 15.0,
+    "floors": 4,
+    "floor_height": 3.75,
+    "cap": "spire",
+    "roof_height": 2.3,
+    "roof_material": "slate",
+    "courses": [
+     {
+      "projection": 0.2,
+      "z": 14.4,
+      "h": 0.45
+     }
+    ]
+   },
+   {
+    "name": "nave",
+    "footprint": [
+     9,
+     18
+    ],
+    "at": [
+     0,
+     0
+    ],
+    "profile": "vertical",
+    "height": 8.0,
+    "floors": 1,
+    "floor_height": 8.0,
+    "cap": "gable",
+    "ridge_axis": "y",
+    "roof_height": 3.2
+   },
+   {
+    "name": "transept",
+    "footprint": [
+     20,
+     5.6
+    ],
+    "at": [
+     0,
+     -3.8
+    ],
+    "profile": "vertical",
+    "height": 8.0,
+    "floors": 1,
+    "floor_height": 8.0,
+    "cap": "gable",
+    "ridge_axis": "x",
+    "roof_height": 2.4
+   },
+   {
+    "name": "apse",
+    "footprint": [
+     6.4,
+     6.4
+    ],
+    "at": [
+     0,
+     -10
+    ],
+    "profile": "vertical",
+    "plan": {
+     "shape": "polygon",
+     "sides": 6
+    },
+    "height": 7.0,
+    "floors": 1,
+    "floor_height": 7.0,
+    "cap": "hip",
+    "roof_material": "slate",
+    "roof_height": 2.0
+   }
+  ],
+  "openings": [
+   {
+    "part": "tower",
+    "face": "s",
+    "centre": 0,
+    "w": 1.6,
+    "kind": "arch",
+    "springing": 1.7,
+    "radius": 0.8,
+    "sill": 0
+   },
+   {
+    "part": "tower",
+    "face": "s",
+    "centre": 0,
+    "w": 0.8,
+    "h": 1.4,
+    "sill": 5.0
+   },
+   {
+    "part": "tower",
+    "face": "s",
+    "centre": 0,
+    "w": 0.8,
+    "h": 1.4,
+    "sill": 8.6
+   },
+   {
+    "part": "tower",
+    "face": "e",
+    "centre": 0,
+    "w": 0.8,
+    "h": 1.4,
+    "sill": 5.0
+   },
+   {
+    "part": "tower",
+    "face": "w",
+    "centre": 0,
+    "w": 0.8,
+    "h": 1.4,
+    "sill": 8.6
+   },
+   {
+    "part": "tower",
+    "face": "s",
+    "centre": 0,
+    "w": 1.2,
+    "kind": "arch",
+    "springing": 1.5,
+    "radius": 0.6,
+    "sill": 11.9
+   },
+   {
+    "part": "tower",
+    "face": "n",
+    "centre": 0,
+    "w": 1.2,
+    "kind": "arch",
+    "springing": 1.5,
+    "radius": 0.6,
+    "sill": 11.9
+   },
+   {
+    "part": "tower",
+    "face": "e",
+    "centre": 0,
+    "w": 1.2,
+    "kind": "arch",
+    "springing": 1.5,
+    "radius": 0.6,
+    "sill": 11.9
+   },
+   {
+    "part": "tower",
+    "face": "w",
+    "centre": 0,
+    "w": 1.2,
+    "kind": "arch",
+    "springing": 1.5,
+    "radius": 0.6,
+    "sill": 11.9
+   },
+   {
+    "part": "nave",
+    "face": "e",
+    "centre": 1.5,
+    "w": 1.0,
+    "kind": "arch",
+    "springing": 2.4,
+    "radius": 0.5,
+    "sill": 2.2
+   },
+   {
+    "part": "nave",
+    "face": "e",
+    "centre": 4.5,
+    "w": 1.0,
+    "kind": "arch",
+    "springing": 2.4,
+    "radius": 0.5,
+    "sill": 2.2
+   },
+   {
+    "part": "nave",
+    "face": "e",
+    "centre": 7.5,
+    "w": 1.0,
+    "kind": "arch",
+    "springing": 2.4,
+    "radius": 0.5,
+    "sill": 2.2
+   },
+   {
+    "part": "nave",
+    "face": "e",
+    "centre": -7.8,
+    "w": 1.0,
+    "kind": "arch",
+    "springing": 2.4,
+    "radius": 0.5,
+    "sill": 2.2
+   },
+   {
+    "part": "nave",
+    "face": "w",
+    "centre": 1.5,
+    "w": 1.0,
+    "kind": "arch",
+    "springing": 2.4,
+    "radius": 0.5,
+    "sill": 2.2
+   },
+   {
+    "part": "nave",
+    "face": "w",
+    "centre": 4.5,
+    "w": 1.0,
+    "kind": "arch",
+    "springing": 2.4,
+    "radius": 0.5,
+    "sill": 2.2
+   },
+   {
+    "part": "nave",
+    "face": "w",
+    "centre": 7.5,
+    "w": 1.0,
+    "kind": "arch",
+    "springing": 2.4,
+    "radius": 0.5,
+    "sill": 2.2
+   },
+   {
+    "part": "nave",
+    "face": "w",
+    "centre": -7.8,
+    "w": 1.0,
+    "kind": "arch",
+    "springing": 2.4,
+    "radius": 0.5,
+    "sill": 2.2
+   },
+   {
+    "part": "transept",
+    "face": "e",
+    "centre": 0,
+    "w": 1.6,
+    "kind": "arch",
+    "springing": 2.6,
+    "radius": 0.8,
+    "sill": 1.6
+   },
+   {
+    "part": "transept",
+    "face": "w",
+    "centre": 0,
+    "w": 1.6,
+    "kind": "arch",
+    "springing": 2.6,
+    "radius": 0.8,
+    "sill": 1.6
+   },
+   {
+    "part": "transept",
+    "face": "s",
+    "centre": -7.5,
+    "w": 1.0,
+    "kind": "arch",
+    "springing": 2.4,
+    "radius": 0.5,
+    "sill": 2.2
+   },
+   {
+    "part": "transept",
+    "face": "s",
+    "centre": 7.5,
+    "w": 1.0,
+    "kind": "arch",
+    "springing": 2.4,
+    "radius": 0.5,
+    "sill": 2.2
+   },
+   {
+    "part": "transept",
+    "face": "n",
+    "centre": -7.5,
+    "w": 1.0,
+    "kind": "arch",
+    "springing": 2.4,
+    "radius": 0.5,
+    "sill": 2.2
+   },
+   {
+    "part": "transept",
+    "face": "n",
+    "centre": 7.5,
+    "w": 1.0,
+    "kind": "arch",
+    "springing": 2.4,
+    "radius": 0.5,
+    "sill": 2.2
+   },
+   {
+    "part": "apse",
+    "face": "n",
+    "centre": -0.8,
+    "w": 0.7,
+    "kind": "arch",
+    "springing": 2.2,
+    "radius": 0.35,
+    "sill": 1.8
+   },
+   {
+    "part": "apse",
+    "face": "n",
+    "centre": 0.8,
+    "w": 0.7,
+    "kind": "arch",
+    "springing": 2.2,
+    "radius": 0.35,
+    "sill": 1.8
+   }
+  ],
+  "notes": "ENTERABLE. Four masses in one connected interior: bell tower 6 x 6 m at the FRONT (Mason's s face is model +Y, so the tower sits at at:[0,+10] to land on the Godot -Z end), nave 9 x 18 m (8 m eaves, slate gable ridge along y), transept 20 x 5.6 m, hexagonal chancel/apse 6.4 m across under a slate hip at the back (hexagonal rather than the round dome: a tessellated dome alone costs ~1.1k collision triangles; the hex sits its flat face against the nave). Way in: arched double door (1.6 m wide, 1.7 m springing + 0.8 m radius = 2.5 m head, arch-headed timber leaf) in the tower's s face, centre 0. Tower/nave masses overlap 2.0 m (>= 2 x 0.45), so the tower's ground floor opens straight into the nave through a 5.1 m wide junction; nave/transept overlap fully, nave/apse 1.8 m (chancel throat ~2.7-3.7 m wide). Only the tower has storeys: 4 x 3.75 m (floors at 0.2/3.95/7.7/11.45), auto-sited alternating flights against the tower's e wall (x +1.865, then +0.315) climbing away from the door (foot at y +12.1, i.e. 0.9 m inside the door), bell chamber at the top with arched openings on all four faces at 11.9-14.0 m. The nave, transept and apse are one tall room (8 m). Tower slabs at 3.95 and 7.7 m protrude ~1.1 m into the nave's west end as a gallery ledge (same behaviour as mason.md's minster). No plinth on the chapel on purpose: a plinth/cornice ring on an overlapping part would run across the junction as a 0.6 m curb the step-assist cannot climb; only the tower gets a cornice at 14.4 m, above every junction. Structure-level floors is 1 (the nave); the tower part declares its own 4 and the manifest reports floors_built 4. Collision shell is ~2.1k tris, over the 1.5k soft budget: ~1k of that is the spire (a lofted apex tessellates finely); accepted for the hill landmark."
+ },
+ {
+  "id": "house_e",
+  "footprint": [
+   8,
+   7
+  ],
+  "floors": 2,
+  "floor_height": 2.9,
+  "wall_t": 0.45,
+  "material": "stone",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "interior": {
+   "floor_z": 0.2
+  },
+  "parts": [
+   {
+    "name": "house",
+    "footprint": [
+     8,
+     7
+    ],
+    "at": [
+     0,
+     0
+    ],
+    "profile": "vertical",
+    "height": 5.8,
+    "floors": 2,
+    "floor_height": 2.9,
+    "cap": "gable",
+    "ridge_axis": "x",
+    "roof_height": 2.2,
+    "courses": [
+     {
+      "projection": 0.12,
+      "z": 0.0,
+      "h": 0.55
+     },
+     {
+      "projection": 0.18,
+      "z": 5.4,
+      "h": 0.4
+     }
+    ]
+   },
+   {
+    "name": "stack",
+    "footprint": [
+     0.9,
+     0.9
+    ],
+    "at": [
+     3.55,
+     1.5
+    ],
+    "profile": "vertical",
+    "height": 8.4,
+    "floors": 1,
+    "floor_height": 8.4,
+    "cap": "flat",
+    "roof_slab": 0.1,
+    "material": "stone",
+    "roof_material": "stone",
+    "interior": false
+   }
+  ],
+  "openings": [
+   {
+    "part": "house",
+    "face": "s",
+    "centre": -2.0,
+    "w": 1.0,
+    "h": 2.05,
+    "sill": 0
+   },
+   {
+    "part": "house",
+    "face": "s",
+    "centre": 1.6,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "s",
+    "centre": -2.0,
+    "w": 1.0,
+    "h": 1.1,
+    "sill": 3.9
+   },
+   {
+    "part": "house",
+    "face": "s",
+    "centre": 1.6,
+    "w": 1.0,
+    "h": 1.1,
+    "sill": 3.9
+   },
+   {
+    "part": "house",
+    "face": "e",
+    "centre": -1.0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "e",
+    "centre": -1.0,
+    "w": 0.9,
+    "h": 1.1,
+    "sill": 3.9
+   },
+   {
+    "part": "house",
+    "face": "w",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "w",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.1,
+    "sill": 3.9
+   },
+   {
+    "part": "house",
+    "face": "n",
+    "centre": -2.8,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "n",
+    "centre": 2.8,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "n",
+    "centre": -2.0,
+    "w": 0.9,
+    "h": 1.1,
+    "sill": 3.9
+   },
+   {
+    "part": "house",
+    "face": "n",
+    "centre": 2.0,
+    "w": 0.9,
+    "h": 1.1,
+    "sill": 3.9
+   }
+  ],
+  "notes": "ENTERABLE. Door on s face centre -2.0 (1.0 x 2.05 m). Auto-sited stair runs along x against the back (n) wall; 2 storeys of 2.9 m (floors at z 0.2 and 3.1), upper floor one open room 7.1 x 6.1 m. Stone chimney stack on the e gable end at y +1.5. Slate gable ridge along x, plinth course + cornice band."
+ },
+ {
+  "id": "wreck",
+  "footprint": [
+   24,
+   8
+  ],
+  "floors": 1,
+  "floor_height": 4.6,
+  "wall_t": 0.4,
+  "material": "metal",
+  "roof_material": "metal",
+  "collider": "mesh",
+  "interior": {
+   "floor_z": 0.2
+  },
+  "parts": [
+   {
+    "name": "hull",
+    "footprint": [
+     24,
+     8
+    ],
+    "at": [
+     0,
+     0
+    ],
+    "plan": {
+     "shape": "polygon",
+     "sides": 6
+    },
+    "profile": "vertical",
+    "height": 4.6,
+    "floors": 1,
+    "floor_height": 4.6,
+    "cap": "flat",
+    "roof_slab": 0.3,
+    "material": "metal",
+    "roof_material": "metal",
+    "courses": [
+     {
+      "projection": 0.12,
+      "z": 4.1,
+      "h": 0.35
+     }
+    ]
+   },
+   {
+    "name": "deckhouse",
+    "footprint": [
+     5,
+     8
+    ],
+    "at": [
+     7,
+     0
+    ],
+    "profile": "vertical",
+    "height": 6.9,
+    "floors": 1,
+    "floor_height": 6.9,
+    "cap": "flat",
+    "roof_slab": 0.25,
+    "material": "metal",
+    "roof_material": "metal",
+    "interior": false
+   },
+   {
+    "name": "wheelhouse",
+    "footprint": [
+     3.6,
+     4.6
+    ],
+    "at": [
+     7.2,
+     0
+    ],
+    "profile": "vertical",
+    "height": 9.6,
+    "floors": 1,
+    "floor_height": 9.6,
+    "cap": "flat",
+    "roof_slab": 0.25,
+    "material": "metal",
+    "roof_material": "metal",
+    "interior": false
+   },
+   {
+    "name": "mast",
+    "footprint": [
+     0.9,
+     0.9
+    ],
+    "at": [
+     -11.4,
+     0
+    ],
+    "profile": "vertical",
+    "height": 12.0,
+    "floors": 1,
+    "floor_height": 12.0,
+    "cap": "flat",
+    "roof_slab": 0.1,
+    "material": "metal",
+    "roof_material": "metal",
+    "interior": false
+   }
+  ],
+  "openings": [
+   {
+    "part": "hull",
+    "face": "s",
+    "centre": -3.0,
+    "w": 1.6,
+    "h": 2.3,
+    "sill": 0,
+    "leaf": false
+   },
+   {
+    "part": "deckhouse",
+    "face": "s",
+    "centre": -1.2,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 5.5
+   },
+   {
+    "part": "deckhouse",
+    "face": "s",
+    "centre": 1.2,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 5.5
+   },
+   {
+    "part": "deckhouse",
+    "face": "n",
+    "centre": -1.2,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 5.5
+   },
+   {
+    "part": "deckhouse",
+    "face": "n",
+    "centre": 1.2,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 5.5
+   },
+   {
+    "part": "wheelhouse",
+    "face": "w",
+    "centre": -1.1,
+    "w": 0.9,
+    "h": 1.0,
+    "sill": 7.9
+   },
+   {
+    "part": "wheelhouse",
+    "face": "w",
+    "centre": 1.1,
+    "w": 0.9,
+    "h": 1.0,
+    "sill": 7.9
+   },
+   {
+    "part": "wheelhouse",
+    "face": "s",
+    "centre": -0.9,
+    "w": 0.9,
+    "h": 1.0,
+    "sill": 7.9
+   },
+   {
+    "part": "wheelhouse",
+    "face": "s",
+    "centre": 0.9,
+    "w": 0.9,
+    "h": 1.0,
+    "sill": 7.9
+   },
+   {
+    "part": "wheelhouse",
+    "face": "n",
+    "centre": -0.9,
+    "w": 0.9,
+    "h": 1.0,
+    "sill": 7.9
+   },
+   {
+    "part": "wheelhouse",
+    "face": "n",
+    "centre": 0.9,
+    "w": 0.9,
+    "h": 1.0,
+    "sill": 7.9
+   },
+   {
+    "part": "wheelhouse",
+    "face": "e",
+    "centre": 0,
+    "w": 1.2,
+    "h": 1.0,
+    "sill": 7.9
+   }
+  ],
+  "notes": "ENTERABLE (the hold). The footprint [24,8] puts the hull's long axis along x, so the pointed ends are the e/w faces and the 24 m sides are s/n; the hexagon plan (sides 6, clipped to the box) gives a pointed bow at x -12 and stern at x +12 with flat sides at y +-4 between x +-9.7. Way in: a torn-open gash in the hull's s (landward) SIDE, centre x -3.0, 1.6 x 2.3 m, sill 0, no leaf. Hold = one open space 23 x 7 m under the deck (deck slab 4.6-4.9 m), floor at z 0.2, no stair. Superstructure is SOLID (interior:false) and sealed: a full-beam deckhouse 5 x 8 m at x +7 (2.3 m above deck) with a 3.6 x 4.6 m wheelhouse on top (to 9.6 m), recessed window panels on all faces; full-beam rather than the requested [5,4.5] because a narrower deckhouse standing only on the deck slab is a DISCONNECTED body (the hold void carves everything under the deck) - spanning the hull's side walls is what fuses it to the hull. Mast 0.9 x 0.9 m, 12 m tall, rooted in the solid bow point at x -11.4 for the same connectivity reason. Gunwale band at 4.1 m. Place with rot so the s face is landward."
+ },
+ {
+  "id": "sea_caves",
+  "footprint": [
+   22,
+   16
+  ],
+  "floors": 1,
+  "floor_height": 5.0,
+  "wall_t": 0.7,
+  "material": "stone",
+  "roof_material": "stone",
+  "collider": "mesh",
+  "interior": {
+   "floor_z": 0.2
+  },
+  "parts": [
+   {
+    "name": "mouth",
+    "footprint": [
+     11,
+     9
+    ],
+    "at": [
+     -5.5,
+     3.5
+    ],
+    "plan": {
+     "shape": "polygon",
+     "sides": 8
+    },
+    "profile": "batter",
+    "shrink": 0.1,
+    "height": 5.0,
+    "floors": 1,
+    "floor_height": 5.0,
+    "cap": "gable",
+    "roof_material": "stone",
+    "roof_height": 1.6,
+    "ridge_axis": "x"
+   },
+   {
+    "name": "main",
+    "footprint": [
+     14.5,
+     11
+    ],
+    "at": [
+     3.75,
+     -0.5
+    ],
+    "plan": {
+     "shape": "polygon",
+     "sides": 10
+    },
+    "profile": "batter",
+    "shrink": 0.1,
+    "height": 6.5,
+    "floors": 1,
+    "floor_height": 6.5,
+    "cap": "gable",
+    "roof_material": "stone",
+    "roof_height": 2.2,
+    "ridge_axis": "y"
+   },
+   {
+    "name": "back",
+    "footprint": [
+     11,
+     8
+    ],
+    "at": [
+     -5.5,
+     -4.0
+    ],
+    "plan": {
+     "shape": "polygon",
+     "sides": 8
+    },
+    "profile": "batter",
+    "shrink": 0.1,
+    "height": 4.5,
+    "floors": 1,
+    "floor_height": 4.5,
+    "cap": "gable",
+    "roof_material": "stone",
+    "roof_height": 1.4,
+    "ridge_axis": "x"
+   }
+  ],
+  "openings": [
+   {
+    "part": "mouth",
+    "face": "s",
+    "centre": 0,
+    "w": 2.2,
+    "kind": "arch",
+    "springing": 1.5,
+    "radius": 1.1,
+    "sill": 0,
+    "leaf": false
+   }
+  ],
+  "notes": "ENTERABLE. Three battered polygonal chambers (clipped 8/10/8-gons - faceted rock rather than smooth ellipses, which also cuts the collision shell from ~8k to a few hundred triangles), one connected void: mouth chamber 11 x 9 m (5 m) at the front-left, main chamber 14.5 x 11 m (6.5 m) on the right, back chamber 11 x 8 m (4.5 m) behind the mouth. Interior voids (each inset 0.7 m) overlap along the centre lines -> throats several metres wide mouth->main and main->back; mouth and back do not touch directly (route is mouth -> main -> back). ONE way in: open arch (2.2 m wide, 1.5 m springing + 1.1 m radius = 2.6 m crown, no leaf) in the mouth chamber's s face, centre 0 (at x -5.5 on the structure's s edge; the clipped polygon has a flat face there). No windows, floor z 0.2, no stairs. Caps are low gabled rock-ridges clipped to each polygon (solid, roof_height 1.6/2.2/1.4, alternating ridge axes) above flat 5/6.5/4.5 m ceilings - not the requested domes, because a tessellated dome or pyramid cap alone puts 1-1.5k triangles per chamber into the collision shell; the batter + facets carry the 'rock' read. Arch crown is 2.6 m (not the requested 2.7) so it stays inside the door gate without a gate:true flag."
+ },
+ {
+  "id": "house_a",
+  "footprint": [
+   8,
+   7
+  ],
+  "floors": 1,
+  "floor_height": 5.8,
+  "wall_t": 0.45,
+  "material": "stone",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "parts": [
+   {
+    "name": "house",
+    "footprint": [
+     8,
+     7
+    ],
+    "at": [
+     0,
+     0
+    ],
+    "profile": "vertical",
+    "height": 5.8,
+    "floors": 1,
+    "floor_height": 5.8,
+    "cap": "gable",
+    "ridge_axis": "x",
+    "roof_height": 2.2,
+    "plinth": {
+     "projection": 0.12,
+     "top_z": 0.6,
+     "chamfer": 0.06
+    },
+    "cornice": {
+     "projection": 0.18,
+     "z": 5.4,
+     "h": 0.4
+    }
+   },
+   {
+    "name": "stack",
+    "footprint": [
+     0.9,
+     0.9
+    ],
+    "at": [
+     -3.55,
+     -1.5
+    ],
+    "profile": "vertical",
+    "height": 8.4,
+    "floors": 1,
+    "floor_height": 8.4,
+    "cap": "flat",
+    "roof_slab": 0.1,
+    "material": "stone",
+    "roof_material": "stone"
+   }
+  ],
+  "openings": [
+   {
+    "part": "house",
+    "face": "s",
+    "centre": -2.2,
+    "w": 1.0,
+    "h": 2.05,
+    "sill": 0,
+    "niche": true,
+    "depth": 0.12
+   },
+   {
+    "part": "house",
+    "face": "s",
+    "centre": 1.5,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "s",
+    "centre": -2.2,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 3.8
+   },
+   {
+    "part": "house",
+    "face": "s",
+    "centre": 1.5,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 3.8
+   },
+   {
+    "part": "house",
+    "face": "e",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "e",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 3.8
+   },
+   {
+    "part": "house",
+    "face": "n",
+    "centre": -2.0,
+    "w": 0.9,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "n",
+    "centre": 2.0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 3.8
+   }
+  ],
+  "notes": "SEALED. Solid two-storey-tall stone cottage (5.8 m eaves, two rows of windows) declared floors:1 so Mason builds no interior; the s-face 'door' is a blind niche 0.12 m deep (reads as a shut door, no leaf, solid in the collision shell). Chimney stack on the w gable end."
+ },
+ {
+  "id": "house_b",
+  "footprint": [
+   9,
+   7
+  ],
+  "floors": 1,
+  "floor_height": 5.8,
+  "wall_t": 0.4,
+  "material": "plaster",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "parts": [
+   {
+    "name": "house",
+    "footprint": [
+     9,
+     7
+    ],
+    "at": [
+     0,
+     0
+    ],
+    "profile": "vertical",
+    "height": 5.8,
+    "floors": 1,
+    "floor_height": 5.8,
+    "cap": "gable",
+    "ridge_axis": "y",
+    "roof_height": 2.6,
+    "plinth": {
+     "projection": 0.12,
+     "top_z": 0.55,
+     "chamfer": 0.05
+    },
+    "cornice": {
+     "projection": 0.16,
+     "z": 5.4,
+     "h": 0.4
+    }
+   },
+   {
+    "name": "stack",
+    "footprint": [
+     0.9,
+     0.9
+    ],
+    "at": [
+     -4.05,
+     1.0
+    ],
+    "profile": "vertical",
+    "height": 7.6,
+    "floors": 1,
+    "floor_height": 7.6,
+    "cap": "flat",
+    "roof_slab": 0.1,
+    "material": "plaster",
+    "roof_material": "plaster"
+   }
+  ],
+  "openings": [
+   {
+    "part": "house",
+    "face": "s",
+    "centre": 1.8,
+    "w": 1.0,
+    "h": 2.05,
+    "sill": 0,
+    "niche": true,
+    "depth": 0.12
+   },
+   {
+    "part": "house",
+    "face": "s",
+    "centre": -2.0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "s",
+    "centre": -2.0,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 3.8
+   },
+   {
+    "part": "house",
+    "face": "s",
+    "centre": 1.8,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 3.8
+   },
+   {
+    "part": "house",
+    "face": "e",
+    "centre": -1.5,
+    "w": 0.9,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "e",
+    "centre": 1.5,
+    "w": 0.9,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "e",
+    "centre": -1.5,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 3.8
+   },
+   {
+    "part": "house",
+    "face": "e",
+    "centre": 1.5,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 3.8
+   },
+   {
+    "part": "house",
+    "face": "w",
+    "centre": -1.5,
+    "w": 0.9,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "w",
+    "centre": -1.5,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 3.8
+   },
+   {
+    "part": "house",
+    "face": "n",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 3.8
+   }
+  ],
+  "notes": "SEALED. Plaster (off-white) two-storey-tall cottage, gable ridge along y (gable ends face the street), floors:1 so no interior; blind niche door on s at centre +1.8; chimney on the w eaves side."
+ },
+ {
+  "id": "house_c",
+  "footprint": [
+   7,
+   6
+  ],
+  "floors": 1,
+  "floor_height": 3.0,
+  "wall_t": 0.45,
+  "material": "stone",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "parts": [
+   {
+    "name": "house",
+    "footprint": [
+     7,
+     6
+    ],
+    "at": [
+     0,
+     0
+    ],
+    "profile": "vertical",
+    "height": 3.0,
+    "floors": 1,
+    "floor_height": 3.0,
+    "cap": "gable",
+    "ridge_axis": "x",
+    "roof_height": 1.5,
+    "plinth": {
+     "projection": 0.1,
+     "top_z": 0.45,
+     "chamfer": 0.05
+    },
+    "cornice": {
+     "projection": 0.14,
+     "z": 2.7,
+     "h": 0.3
+    }
+   },
+   {
+    "name": "stack",
+    "footprint": [
+     0.8,
+     0.8
+    ],
+    "at": [
+     3.1,
+     0
+    ],
+    "profile": "vertical",
+    "height": 5.2,
+    "floors": 1,
+    "floor_height": 5.2,
+    "cap": "flat",
+    "roof_slab": 0.1,
+    "material": "stone",
+    "roof_material": "stone"
+   }
+  ],
+  "openings": [
+   {
+    "part": "house",
+    "face": "s",
+    "centre": -1.8,
+    "w": 0.9,
+    "h": 1.95,
+    "sill": 0,
+    "niche": true,
+    "depth": 0.12
+   },
+   {
+    "part": "house",
+    "face": "s",
+    "centre": 1.4,
+    "w": 1.0,
+    "h": 1.1,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "w",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.1,
+    "sill": 0.9
+   },
+   {
+    "part": "house",
+    "face": "n",
+    "centre": 1.5,
+    "w": 0.9,
+    "h": 1.1,
+    "sill": 0.9
+   }
+  ],
+  "notes": "SEALED. Low single-storey stone cottage, 3.0 m eaves, 1.5 m roof rise; blind niche door on s at centre -1.8; chimney on the e gable."
+ },
+ {
+  "id": "terrace",
+  "footprint": [
+   21,
+   7
+  ],
+  "floors": 1,
+  "floor_height": 5.6,
+  "wall_t": 0.45,
+  "material": "stone",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "parts": [
+   {
+    "name": "c1",
+    "footprint": [
+     7.2,
+     7
+    ],
+    "at": [
+     -6.9,
+     0
+    ],
+    "profile": "vertical",
+    "height": 5.6,
+    "floors": 1,
+    "floor_height": 5.6,
+    "cap": "gable",
+    "ridge_axis": "x",
+    "roof_height": 2.0,
+    "plinth": {
+     "projection": 0.12,
+     "top_z": 0.55,
+     "chamfer": 0.05
+    },
+    "cornice": {
+     "projection": 0.16,
+     "z": 5.2,
+     "h": 0.4
+    }
+   },
+   {
+    "name": "c2",
+    "footprint": [
+     7.4,
+     7
+    ],
+    "at": [
+     0,
+     0
+    ],
+    "profile": "vertical",
+    "height": 6.0,
+    "floors": 1,
+    "floor_height": 6.0,
+    "cap": "gable",
+    "ridge_axis": "x",
+    "roof_height": 2.0,
+    "plinth": {
+     "projection": 0.12,
+     "top_z": 0.55,
+     "chamfer": 0.05
+    },
+    "cornice": {
+     "projection": 0.16,
+     "z": 5.6,
+     "h": 0.4
+    }
+   },
+   {
+    "name": "c3",
+    "footprint": [
+     7.2,
+     7
+    ],
+    "at": [
+     6.9,
+     0
+    ],
+    "profile": "vertical",
+    "height": 5.6,
+    "floors": 1,
+    "floor_height": 5.6,
+    "cap": "gable",
+    "ridge_axis": "x",
+    "roof_height": 2.0,
+    "plinth": {
+     "projection": 0.12,
+     "top_z": 0.55,
+     "chamfer": 0.05
+    },
+    "cornice": {
+     "projection": 0.16,
+     "z": 5.2,
+     "h": 0.4
+    }
+   },
+   {
+    "name": "stack1",
+    "footprint": [
+     0.9,
+     0.9
+    ],
+    "at": [
+     -3.45,
+     0
+    ],
+    "profile": "vertical",
+    "height": 8.7,
+    "floors": 1,
+    "floor_height": 8.7,
+    "cap": "flat",
+    "roof_slab": 0.1,
+    "material": "stone",
+    "roof_material": "stone"
+   },
+   {
+    "name": "stack2",
+    "footprint": [
+     0.9,
+     0.9
+    ],
+    "at": [
+     3.45,
+     0
+    ],
+    "profile": "vertical",
+    "height": 8.7,
+    "floors": 1,
+    "floor_height": 8.7,
+    "cap": "flat",
+    "roof_slab": 0.1,
+    "material": "stone",
+    "roof_material": "stone"
+   }
+  ],
+  "openings": [
+   {
+    "part": "c1",
+    "face": "s",
+    "centre": -1.9,
+    "w": 1.0,
+    "h": 2.05,
+    "sill": 0,
+    "niche": true,
+    "depth": 0.12
+   },
+   {
+    "part": "c1",
+    "face": "s",
+    "centre": 1.5,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "c1",
+    "face": "s",
+    "centre": -1.9,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 3.7
+   },
+   {
+    "part": "c1",
+    "face": "s",
+    "centre": 1.5,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 3.7
+   },
+   {
+    "part": "c1",
+    "face": "n",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "c1",
+    "face": "n",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 3.7
+   },
+   {
+    "part": "c1",
+    "face": "w",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 3.7
+   },
+   {
+    "part": "c2",
+    "face": "s",
+    "centre": -1.9,
+    "w": 1.0,
+    "h": 2.05,
+    "sill": 0,
+    "niche": true,
+    "depth": 0.12
+   },
+   {
+    "part": "c2",
+    "face": "s",
+    "centre": 1.5,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "c2",
+    "face": "s",
+    "centre": -1.9,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 3.9
+   },
+   {
+    "part": "c2",
+    "face": "s",
+    "centre": 1.5,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 3.9
+   },
+   {
+    "part": "c2",
+    "face": "n",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "c2",
+    "face": "n",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 3.9
+   },
+   {
+    "part": "c3",
+    "face": "s",
+    "centre": -1.9,
+    "w": 1.0,
+    "h": 2.05,
+    "sill": 0,
+    "niche": true,
+    "depth": 0.12
+   },
+   {
+    "part": "c3",
+    "face": "s",
+    "centre": 1.5,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "c3",
+    "face": "s",
+    "centre": -1.9,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 3.7
+   },
+   {
+    "part": "c3",
+    "face": "s",
+    "centre": 1.5,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 3.7
+   },
+   {
+    "part": "c3",
+    "face": "n",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "c3",
+    "face": "n",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 3.7
+   },
+   {
+    "part": "c3",
+    "face": "e",
+    "centre": 0,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 3.7
+   }
+  ],
+  "notes": "SEALED. Three joined stone cottages in a row (each ~7.2 x 7 m, overlapping 0.4 m so they fuse into one body), eaves 5.6 / 6.0 / 5.6 m so the ridge steps by 0.4 m at the middle cottage; two shared chimney stacks on the party-wall lines at x +-3.45 rising through the ridge. Each cottage has a blind niche door on s at its centre -1.9 and windows on two floors. floors:1 so no interior is built."
+ },
+ {
+  "id": "store",
+  "footprint": [
+   10,
+   8
+  ],
+  "floors": 1,
+  "floor_height": 6.2,
+  "wall_t": 0.45,
+  "material": "stone",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "parts": [
+   {
+    "name": "shop",
+    "footprint": [
+     10,
+     8
+    ],
+    "at": [
+     0,
+     0
+    ],
+    "profile": "vertical",
+    "height": 6.2,
+    "floors": 1,
+    "floor_height": 6.2,
+    "cap": "gable",
+    "ridge_axis": "x",
+    "roof_height": 2.4,
+    "plinth": {
+     "projection": 0.12,
+     "top_z": 0.6,
+     "chamfer": 0.06
+    },
+    "courses": [
+     {
+      "projection": 0.1,
+      "z": 3.3,
+      "h": 0.25
+     }
+    ],
+    "cornice": {
+     "projection": 0.2,
+     "z": 5.8,
+     "h": 0.4
+    }
+   },
+   {
+    "name": "stack",
+    "footprint": [
+     0.9,
+     0.9
+    ],
+    "at": [
+     -4.55,
+     1.5
+    ],
+    "profile": "vertical",
+    "height": 8.8,
+    "floors": 1,
+    "floor_height": 8.8,
+    "cap": "flat",
+    "roof_slab": 0.1,
+    "material": "stone",
+    "roof_material": "stone"
+   }
+  ],
+  "openings": [
+   {
+    "part": "shop",
+    "face": "s",
+    "centre": -3.0,
+    "w": 1.1,
+    "h": 2.2,
+    "sill": 0,
+    "niche": true,
+    "depth": 0.12
+   },
+   {
+    "part": "shop",
+    "face": "s",
+    "centre": 1.6,
+    "w": 3.4,
+    "h": 1.9,
+    "sill": 0.9
+   },
+   {
+    "part": "shop",
+    "face": "s",
+    "centre": -3.0,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 4.0
+   },
+   {
+    "part": "shop",
+    "face": "s",
+    "centre": 0,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 4.0
+   },
+   {
+    "part": "shop",
+    "face": "s",
+    "centre": 3.0,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 4.0
+   },
+   {
+    "part": "shop",
+    "face": "e",
+    "centre": 0,
+    "w": 1.0,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "shop",
+    "face": "e",
+    "centre": 0,
+    "w": 1.0,
+    "h": 1.2,
+    "sill": 4.0
+   },
+   {
+    "part": "shop",
+    "face": "n",
+    "centre": -2.5,
+    "w": 0.9,
+    "h": 1.3,
+    "sill": 0.9
+   },
+   {
+    "part": "shop",
+    "face": "n",
+    "centre": 2.5,
+    "w": 0.9,
+    "h": 1.2,
+    "sill": 4.0
+   }
+  ],
+  "notes": "SEALED. Two-storey-tall stone shop (6.2 m eaves) with a wide 3.4 x 1.9 m shop window on s (sill 0.9) and a blind niche shop door at s centre -3.0; string course at first-floor level, chimney on the w gable. floors:1 so no interior."
+ },
+ {
+  "id": "shed_a",
+  "footprint": [
+   6,
+   5
+  ],
+  "floors": 1,
+  "floor_height": 2.8,
+  "wall_t": 0.35,
+  "material": "timber",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "profile": "vertical",
+  "height": 2.8,
+  "cap": "gable",
+  "ridge_axis": "x",
+  "roof_height": 1.2,
+  "plinth": {
+   "projection": 0.1,
+   "top_z": 0.4
+  },
+  "courses": [
+   {
+    "projection": 0.12,
+    "z": 2.55,
+    "h": 0.25
+   }
+  ],
+  "openings": [
+   {
+    "face": "s",
+    "centre": 1.4,
+    "w": 0.8,
+    "h": 0.8,
+    "sill": 1.2
+   },
+   {
+    "face": "e",
+    "centre": 0,
+    "w": 0.8,
+    "h": 0.8,
+    "sill": 1.2
+   }
+  ],
+  "notes": "SEALED. Small timber shed, 2.8 m eaves, low slate gable, two small windows, no door."
+ },
+ {
+  "id": "shed_b",
+  "footprint": [
+   9,
+   6
+  ],
+  "floors": 1,
+  "floor_height": 3.2,
+  "wall_t": 0.35,
+  "material": "timber",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "profile": "vertical",
+  "height": 3.2,
+  "cap": "gable",
+  "ridge_axis": "x",
+  "roof_height": 1.5,
+  "plinth": {
+   "projection": 0.1,
+   "top_z": 0.45
+  },
+  "courses": [
+   {
+    "projection": 0.12,
+    "z": 2.95,
+    "h": 0.25
+   }
+  ],
+  "openings": [
+   {
+    "face": "s",
+    "centre": -2.5,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 1.2
+   },
+   {
+    "face": "s",
+    "centre": 2.5,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 1.2
+   },
+   {
+    "face": "n",
+    "centre": 0,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 1.2
+   }
+  ],
+  "notes": "SEALED. Timber work shed, 3.2 m eaves, slate gable ridge along x, three small windows, no door."
+ },
+ {
+  "id": "boathouse",
+  "footprint": [
+   12,
+   7
+  ],
+  "floors": 1,
+  "floor_height": 4.5,
+  "wall_t": 0.35,
+  "material": "timber",
+  "roof_material": "slate",
+  "collider": "mesh",
+  "profile": "vertical",
+  "height": 4.5,
+  "cap": "gable",
+  "ridge_axis": "x",
+  "roof_height": 2.4,
+  "plinth": {
+   "projection": 0.1,
+   "top_z": 0.5
+  },
+  "courses": [
+   {
+    "projection": 0.14,
+    "z": 4.2,
+    "h": 0.3
+   }
+  ],
+  "openings": [
+   {
+    "face": "s",
+    "centre": 0,
+    "w": 2.4,
+    "h": 2.6,
+    "sill": 0,
+    "niche": true,
+    "depth": 0.14
+   },
+   {
+    "face": "s",
+    "centre": -4.2,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.0
+   },
+   {
+    "face": "s",
+    "centre": 4.2,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.0
+   },
+   {
+    "face": "n",
+    "centre": -3.0,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.0
+   },
+   {
+    "face": "n",
+    "centre": 3.0,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.0
+   },
+   {
+    "face": "e",
+    "centre": 0,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.0
+   },
+   {
+    "face": "w",
+    "centre": 0,
+    "w": 0.9,
+    "h": 0.9,
+    "sill": 3.0
+   }
+  ],
+  "notes": "SEALED. Tall timber boathouse, 4.5 m eaves, slate gable ridge along x; the 2.4 x 2.6 m boat door on s is a blind niche 0.14 m deep (shut), high small windows all round."
+ }
+]

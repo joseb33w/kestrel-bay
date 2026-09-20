@@ -1,36 +1,95 @@
 {
-  "quests": [
+ "director_managed": true,
+ "quests": [
+  {
+   "id": "settle_in",
+   "name": "Settle In",
+   "giver": "harbour_master",
+   "steps": [
     {
-      "id": "clear_dungeon",
-      "name": "Clear the Dungeon",
-      "auto_start": true,
-      "giver": "captain",
-      "steps": [
-        {
-          "id": "slay",
-          "objective": {
-            "type": "kill_count",
-            "target": "skeleton",
-            "count": 5
-          },
-          "desc": "Defeat the 5 skeletons"
-        },
-        {
-          "id": "key",
-          "objective": {
-            "type": "collect",
-            "target": "vault_key"
-          },
-          "desc": "Take the Vault Key from the chest"
-        }
-      ],
-      "rewards": {
-        "xp": 120,
-        "gold": 75
-      },
-      "on_complete_flags": [
-        "dungeon_cleared"
-      ]
+     "id": "master",
+     "objective": {
+      "type": "talk_to",
+      "target": "harbour_master"
+     },
+     "desc": "Find the Harbour Master in his office on the quay"
+    },
+    {
+     "id": "pub",
+     "objective": {
+      "type": "talk_to",
+      "target": "barmaid"
+     },
+     "desc": "Climb to the town and ask at the Kestrel Arms"
     }
-  ]
+   ],
+   "rewards": {
+    "xp": 40,
+    "gold": 20
+   },
+   "on_complete_flags": [
+    "met_town"
+   ]
+  },
+  {
+   "id": "smugglers",
+   "name": "The Marguerite",
+   "prereq": {
+    "quests": [
+     "settle_in"
+    ]
+   },
+   "steps": [
+    {
+     "id": "reach",
+     "objective": {
+      "type": "reach_area",
+      "target": "c9_-6"
+     },
+     "desc": "Get down the coast to the wreck (boat, or the cliff path)"
+    },
+    {
+     "id": "gun",
+     "objective": {
+      "type": "collect",
+      "target": "shotgun"
+     },
+     "desc": "Search the wreck for something better than a boat hook"
+    },
+    {
+     "id": "clear",
+     "objective": {
+      "type": "kill_count",
+      "target": "smuggler",
+      "count": 8
+     },
+     "desc": "Deal with the 8 smugglers"
+    },
+    {
+     "id": "boss",
+     "objective": {
+      "type": "kill_count",
+      "target": "ringleader",
+      "count": 1
+     },
+     "desc": "Take down the ringleader in the caves"
+    },
+    {
+     "id": "loot",
+     "objective": {
+      "type": "collect",
+      "target": "contraband"
+     },
+     "desc": "Take the contraband from the cave"
+    }
+   ],
+   "rewards": {
+    "xp": 300,
+    "gold": 200
+   },
+   "on_complete_flags": [
+    "cove_cleared"
+   ]
+  }
+ ]
 }
