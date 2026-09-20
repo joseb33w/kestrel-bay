@@ -123,6 +123,13 @@ var look_idx := -1
 var _gui_touch_idx := -1
 var look_last := Vector2.ZERO
 var swing_t := 0.0                 # melee swing window (visual + re-tap gate) — decays in _process
+var _swing_len := 0.22             # THIS swing's full duration — the attack CLIP's own length when the
+                                   # rig has one, so the weapon arc and the body animation finish together
+var _swing_procedural := false     # true only when the rig has NO attack clip: the hand-slot arc is then
+                                   # the only motion there is, so it runs. With a real clip it must NOT —
+                                   # weapon_slot is a BoneAttachment3D on the hand, so rotating it while
+                                   # the clip already swings the arm double-animates the weapon out of phase
+var _no_attack_clip_logged := false
 # Wave 4 equipped-weapon state. GEquip owns the attached visual; main tracks the "GEquipSlot"
 # node it hangs on the player (the swing pivot AND the ranged muzzle origin) and keeps the
 # visual in sync with rpg.equipped_weapon (_sync_equip_visual).
@@ -1104,7 +1111,10 @@ func _process(delta: float) -> void:
 
 	if weapon_slot != null and is_instance_valid(weapon_slot) \
 			and String(_equipped_def().get("kind", "melee")) == "melee":
-		weapon_slot.rotation_degrees.x = (-90.0 + (1.0 - swing_t / 0.22) * 120.0) if swing_t > 0.0 else -10.0
+		if _swing_procedural:
+			weapon_slot.rotation_degrees.x = (-90.0 + (1.0 - swing_t / maxf(0.05, _swing_len)) * 120.0) if swing_t > 0.0 else -10.0
+		elif swing_t <= 0.0:
+			weapon_slot.rotation_degrees.x = -10.0   # the clip owns the swing; just restore the carry pose
 	if chunk_mode and chunk_manager != null:
 		chunk_manager.tick(delta)
 	if stats:
@@ -1171,9 +1181,21 @@ func _attack() -> void:
 		return
 	if swing_t > 0.0:
 		return
-	swing_t = 0.22
-	_hero_anim_state.attack_t = 0.45   # play the melee swing body animation
-	_hero_anim_state.play("attack")
+	# THE CLIP DECIDES HOW LONG THE SWING IS. Both timers used to be constants that matched neither
+	# each other nor any rig — see HeroAnim.strike() for the two failure modes that produced.
+	var swing_len := _hero_anim_state.strike("attack")
+	_swing_procedural = swing_len <= 0.0
+	if _swing_procedural:
+		# No attack clip on this rig. The hand-slot arc is all the feedback there is, so it runs —
+		# but SAY SO, because a hero who cannot swing is a rig defect the animation gate must see,
+		# not a quirk to absorb in silence.
+		swing_len = 0.35
+		if not _no_attack_clip_logged:
+			_no_attack_clip_logged = true
+			print("GOGI_NO_ATTACK_CLIP the hero rig has no attack/melee/chop/slash/swing clip — ",
+				"falling back to a weapon-only arc; the character itself does not swing")
+	_swing_len = swing_len
+	swing_t = swing_len
 	AudioManager.play_sfx("attack")
 	var dmg := rpg.weapon_damage()
 	var fwd := player.global_transform.basis.z   # forward=+Z (look_at(pos-dir) faces +Z); -basis.z hit BEHIND (inverted cone)
@@ -1387,7 +1409,13 @@ func take_damage(d: float) -> void:
 	if director != null and director.has_method("wants_death") and director.wants_death():
 		rpg.hp = 0.0
 		director.fire("player_died", {})
-		if director.has_method("_show_defeat"):
+		# THE RULES GET THE FIRST WORD. A world whose `player_died` rule respawns the player has
+		# already answered the death — respawn_player heals to max and calls clear_defeat(), and the
+		# modal then went up ANYWAY, because it was fired unconditionally on the next line. The
+		# result is an input-blocking DEFEATED panel over a living, healed player standing at their
+		# checkpoint, whose TRY AGAIN button reset_run()s away the checkpoint that just saved them.
+		# A player the rules brought back is not defeated; only one still at zero is.
+		if rpg.hp <= 0.0 and director.has_method("_show_defeat"):
 			director._show_defeat()
 		return
 
@@ -1519,8 +1547,8 @@ func set_player_health(hp: float, mx: float) -> bool:
 	if rpg.hp <= 0.0:
 		if director != null and director.has_method("wants_death") and director.wants_death():
 			director.fire("player_died", {})
-			if director.has_method("_show_defeat"):
-				director._show_defeat()
+			if rpg.hp <= 0.0 and director.has_method("_show_defeat"):
+				director._show_defeat()   # see set_player_health's twin above: rules first
 		else:
 			rpg.hp = rpg.max_hp
 			rpg.changed.emit()
@@ -2089,11 +2117,29 @@ func _set_weapon_stowed(stow: bool) -> void:
 
 # ---------------- input ----------------
 
+## DROP EVERY TOUCH THE STICKS ARE HOLDING.
+##
+## `_input` returns early while the player is frozen / a rule holds input / a scene is loading — and
+## it used to return before the RELEASE half of a gesture was processed. A finger already down on
+## the move stick when a panel came up therefore never got its `pressed = false`: `move_idx` stayed
+## claimed and `move_vec` kept its last value, so the moment input came back the character walked
+## off on its own, with nothing on screen touching it. The two symptoms players report — "the
+## controls freeze" and "the character keeps moving without me moving it" — are the same bug from
+## opposite ends of the lock, and both end here.
+func _release_touch_state() -> void:
+	move_idx = -1
+	look_idx = -1
+	_gui_touch_idx = -1
+	move_vec = Vector2.ZERO
+
+
 func _input(event: InputEvent) -> void:
 	if scene_manager == null or scene_manager.transitioning:
+		_release_touch_state()
 		return
 	if input_frozen or (director != null and director.input_locked()):
 		# Returning WITHOUT consuming leaves the GUI layer live, so HUD buttons still respond.
+		_release_touch_state()
 		return   # title screen owns the pointer, or a rule froze the player
 	if event is InputEventKey and event.pressed and not event.echo and (event as InputEventKey).keycode == KEY_SPACE:
 		_jump_queued = true   # consumed next physics frame if the player is on the floor
@@ -2504,6 +2550,13 @@ func _apply_weather(world: Dictionary) -> void:
 		return
 	var sky = world.get("sky", null)
 	if sky is Dictionary:
+		# `fx: false` turns the per-pixel half of the atmosphere stack back off for a world that is
+		# already at its frame budget. An escape hatch, not a default — a build should have to say
+		# it needs the frame time, rather than everyone paying for the world that did.
+		if (sky as Dictionary).has("fx"):
+			var want_heavy: bool = bool((sky as Dictionary)["fx"]) and not _on_web
+			_apply_env_fx(env, want_heavy)
+			_log_env_fx(env, want_heavy)   # the world overrode it; the log must say what RAN
 		weather.apply(sky)
 
 
@@ -2953,6 +3006,91 @@ func _switch_world(url: String, room: String = "") -> void:
 	get_tree().call_deferred("reload_current_scene")
 
 
+## THE ATMOSPHERE STACK — everything gl_compatibility allows and nothing was switching on.
+##
+## Split into two tiers because they cost very different things. The ALWAYS tier is shape-only: it
+## configures fog terms that do nothing until a weather preset raises fog_density, plus debanding,
+## and costs essentially zero. The HEAVY tier (SSAO, glow, MSAA) is per-pixel work, and it is off
+## on web for the same reason sun shadows are (see _boot): the web tier is the constrained one and
+## already runs shadowless.
+##
+## `heavy` can be overridden per world with `sky: {"fx": false}` — a world that is already at its
+## frame budget should be able to say so rather than have this imposed on it.
+##
+## NOT SET, deliberately: tonemap_exposure stays 1.0 (ACES with tonemap_white 4.0 is already tuned
+## around it, and moving exposure would invalidate every colour in weather3d's tables), and the
+## ambient source stays COLOR — weather3d owns ambient per time-of-day on purpose, and switching
+## it to SKY would hand that control to a gradient.
+func _apply_env_fx(e: Environment, heavy: bool) -> void:
+	if e == null:
+		return
+	# --- always: the free half ---
+	# Aerial perspective is the one that makes DISTANCE read: it tints far geometry toward the sky
+	# colour, which is why a real horizon recedes and a rendered one looks like a painted flat.
+	e.fog_aerial_perspective = 0.55
+	# Sun scatter warms the fog toward the sun, so a low sun throws haze across the scene.
+	e.fog_sun_scatter = 0.18
+	# Height fog pools mist in the valleys instead of laying an even veil over everything.
+	e.fog_height = 6.0
+	e.fog_height_density = 0.015
+	e.fog_sky_affect = 0.35   # the sky keeps most of its own colour; fog is for the ground plane
+	var vp := get_viewport()
+	if vp != null:
+		# Debanding costs a dither and removes the stepped bands a 3-stop sky gradient shows on an
+		# 8-bit buffer — the most visible artefact in an empty sky, and nearly free to fix.
+		vp.use_debanding = true
+		vp.msaa_3d = Viewport.MSAA_2X if heavy else Viewport.MSAA_DISABLED
+	if not heavy:
+		e.ssao_enabled = false
+		e.glow_enabled = false
+		return
+	# --- heavy: per-pixel, native only ---
+	# SSAO does the job terrain shadows cannot: terrain is cast_shadow OFF everywhere and the sun's
+	# shadow is a 32 m cascade, so nothing darkens the crease where a wall meets the ground or the
+	# inside of a doorway. Conservative radius and intensity — this is contact shading, not a look.
+	e.ssao_enabled = true
+	e.ssao_radius = 1.2
+	e.ssao_intensity = 1.4
+	e.ssao_power = 1.5
+	e.ssao_detail = 0.4
+	e.ssao_light_affect = 0.2      # keep some AO in lit areas, but do not dirty them
+	e.ssao_ao_channel_affect = 0.0
+	# Glow, set as bloom rather than as an effect: a high threshold so only genuinely bright things
+	# (lit windows, lamps, the sun disc, emissive signage) bleed. Low intensity — the failure mode
+	# here is a hazy washed-out frame, which is worse than no glow at all.
+	e.glow_enabled = true
+	e.glow_intensity = 0.55
+	e.glow_strength = 1.0
+	e.glow_bloom = 0.05
+	e.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	e.glow_hdr_threshold = 1.15
+	e.glow_hdr_scale = 2.0
+
+
+## SAY WHICH TIER IS RUNNING, because nothing downstream can otherwise tell.
+##
+## The heavy half of the atmosphere stack is native-only, and the build pipeline measures the WEB
+## export — so the one thing that costs real fragment time is invisible to the only automated
+## thing that would price it. The container will happily report a healthy frame budget for a tier
+## it never rendered. Only a phone can answer that question, and when someone reports a frame rate
+## from one, the first thing worth knowing is which tier they were looking at.
+##
+## One line at boot, read the same way GOGI_VRAM_MB is. It makes a device report interpretable
+## instead of a guess, and it makes "we turned SSAO on and it got slow" a checkable claim.
+func _log_env_fx(e: Environment, heavy: bool) -> void:
+	if e == null:
+		return
+	var vp := get_viewport()
+	print("GOGI_ENV_FX tier=", "heavy" if heavy else "light",
+		" ssao=", 1 if e.ssao_enabled else 0,
+		" glow=", 1 if e.glow_enabled else 0,
+		" msaa=", (int(vp.msaa_3d) if vp != null else -1),
+		" deband=", (1 if (vp != null and vp.use_debanding) else 0),
+		" rscale=", "%.2f" % (vp.scaling_3d_scale if vp != null else -1.0),
+		" aerial=", "%.2f" % e.fog_aerial_perspective,
+		" web=", 1 if _on_web else 0)
+
+
 func _build_env() -> void:
 	var we := WorldEnvironment.new()
 	env = Environment.new()
@@ -2962,8 +3100,15 @@ func _build_env() -> void:
 	env.ambient_light_color = Color(0.6, 0.6, 0.66)
 	# Look upgrade (env is shared; the Weather3D system reuses it and only overrides sky/ambient, so
 	# these survive). ACES tonemap = warm/filmic vs the flat linear default; a touch of contrast +
-	# saturation so nothing reads washed-out. Both are Compatibility/WebGL2-safe (Environment GLOW is
-	# NOT — neon is faked with emissive + an additive quad per art.md, never env.glow_enabled).
+	# saturation so nothing reads washed-out.
+	#
+	# THE PARENTHESIS THAT USED TO BE HERE SAID GLOW IS NOT COMPATIBILITY-SAFE. On Godot 4.7.1 that
+	# is no longer true, and it had been quietly costing us the whole post stack. Measured directly
+	# against the shipped 4.7.1 binary under --rendering-driver opengl3: ssao_enabled, glow_enabled,
+	# tonemap_exposure, every fog_* term, ProceduralSkyMaterial.sky_cover, msaa_3d and use_debanding
+	# are all accepted in SILENCE. Only ssil, ssr, sdfgi and volumetric_fog print "only available
+	# when using the Forward+ renderer". So the outdoor look was limited by a stale comment, not by
+	# the renderer — see _apply_env_fx.
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
 	# tonemap_white MUST be > 1.0: at the default (1.0) ACES clips ALL radiance >= 1.0 to pure
 	# white, so any albedo >= ~0.72 under the noon sun+ambient renders as a detail-free blob
@@ -2973,6 +3118,8 @@ func _build_env() -> void:
 	env.adjustment_enabled = true
 	env.adjustment_contrast = 1.06
 	env.adjustment_saturation = 1.12
+	_apply_env_fx(env, not _on_web)
+	_log_env_fx(env, not _on_web)
 	we.environment = env
 	add_child(we)
 	sun = DirectionalLight3D.new()
@@ -3610,6 +3757,7 @@ func _fetch_glb_scene(url: String) -> Node3D:
 	var scene := doc.generate_scene(st) as Node3D
 	GSurf.cap_textures_for_web(scene)   # mobile VRAM cap (web only), same as area_builder's cell templates
 	GSurf.fix_rigger_materials(scene)   # and repair the rigger's material defaults (all tiers)
+	GSurf.fix_untextured_props(scene, url)   # ... and the library kits that shipped with no textures at all
 	return scene
 
 

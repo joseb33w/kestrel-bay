@@ -1,48 +1,47 @@
 # Goal
 
-Build **Kestrel Bay** — a grey, rain-soaked open-world fishing town on steep coastal cliffs — as a
-Godot 4.7.1 data-driven world (`godot-tmpl-rpg`, chunk mode) exported for the mobile web and
-native-playable via `world.json`:
+Fix Kestrel Bay properly — the reported breakages AND the empty world — in one pass, keeping the
+game DATA-driven (native-playable `world.json`, no game scripts):
 
-- terrain sculpted so the town sits on a +26 m plateau, the sea cliff drops hard to the water, a
-  cove holds the harbour at +1.5 m, a switchback road climbs the cove head, a headland carries the
-  lighthouse, a chapel hill rises behind the town, and a second narrow inlet holds the wrecked
-  trawler and the smugglers' sea caves;
-- every building compiled with Mason (real openings, walkable interiors, plinths on slopes);
-  enterable: lighthouse (stairs to the top), pub (rooms upstairs), harbour office, net shed,
-  chapel, one house, the wreck, the caves — every other house/shed sealed;
-- Meshy characters throughout (player, harbour master, barmaid, fishermen — two of them seated on
-  benches, a pub regular seated at the bar — villagers, melee + rifle smugglers), spoken NPC chat;
-- a drivable truck (assembled body + wheel) and a boat; a boat-hook start weapon and a shotgun
-  found on the wreck; smugglers that rush (melee) and stand off (rifle range);
-- behaviour as data: quests.json + `rules`/`vars`/`hud`/`director` blocks, no game scripts.
+- **Broken:** white/misplaced interior furniture (floating, sunk, in the street, two tables inside
+  each other), near-empty rooms; window holes with no glass; an un-enterable chapel that does not
+  read as a chapel; a pub regular lying in mid-air; an unreachable/absent smuggler ringleader and a
+  cove fight that only ends in a teleport to the start; a hero whose body does not swing with the
+  weapon; NPCs miming with empty hands; a truck that stalls on the switchback; sticky/frozen touch
+  controls; rain falling indoors.
+- **World:** no trees, three repeated bushes, blank pavement blocks, a ten-building town, a
+  four-shed harbour, flat identical ground everywhere.
 
 # Files to touch
 
-- `world.json` (Architect layout → patched with compiled Mason records, NPC personas, weapons,
-  regions music/ambient, rules/vars/hud/director), `quests.json`, `structures.json` (Mason specs)
-- `models/*.glb` (Meshy characters/vehicles/props + Mason `<hash>.lod0.glb` buildings),
-  `models/meshy_assets.jsonl`, `models/mason_assets.jsonl`
-- `audio/*.ogg` (realistic-tier ambient/music/SFX swapped in for the chiptune defaults)
-- `project.godot` (name only), `export_presets.cfg` (viewport-fit=cover), `README.md`, `.gitignore`
-- engine scripts (`*.gd`) are the template's — unmodified
+- Engine (`*.gd`): re-synced to the current `godot-tmpl-rpg` template via `sync-engine.mjs`
+  (fixes upstream: NPC grounding, floor registry for interior dressing, auto plinth with a door
+  slot, hero attack clip length, vehicle climb on grades, indoor rain probe, untextured-prop
+  material repair, `boss` block, `activity`/`holds`/`seated` NPC vocabulary). No hand patches.
+- `structures.json` — Structures specialist: chapel redesigned as nave + porch + chancel + tower,
+  14 new Mason types (chandlery, fish market, warehouse, farmhouse, barn, engine house, ...),
+  existing enterables reviewed. Recompiled with Mason (windows now glazed) → `models/mason/`.
+- `world.json` — Architect specialist fill pass (biome zoning, ground presets, new buildings,
+  lanes/tracks, walls/fences/hedges/steps/clutter, underpin rows removed) → my generator adds
+  biome vegetation scatter (trees/gorse/heather/bracken/rocks/grass), Meshy props, the cove/boss
+  rework (`boss` block inside the cave, ≤6 live enemies, checkpoint + `player_died` → `respawn`),
+  NPC `activity`/`holds`/`seated` fixes → Dressing specialist interiors (`pos` y from the FLOOR).
+- `models/meshy/` — Meshy specialist: interior furniture kit, chapel fittings, harbour clutter,
+  hand prop, coastal vegetation.
+- `quests.json` (descs), `README.md`, `docs/qa_report.md`, `docs/gamefeel_report.md`.
 
 # Verification approach
 
-- Mason walk gate on every compiled building (exit 0, floors_built == declared, doors in the
-  size gate); terrain heights at every building footprint corner via a headless Godot dump of
-  `GTerrain.height` (no floating corners beyond the 8 m plinth limit, doors on the uphill side)
-- qgcheck winnability on `world.json` + `quests.json`
-- `verify.mjs` smoke + FEEL probes on the exported `out/` (boot, console, frames, pck ≤ 80 MB,
-  GPU-memory gate, engine currency, rule vocabulary) — must exit 0 on the shipped export
-- targeted checks: hero facing while walking toward camera, attack drives a real HP delta with
-  particles/flash, enemy closes distance and damages the player, NPC chat contract fetch + panel
-  opens headlessly, portrait + landscape fill, vehicle board
-- QA + Game-Feel specialist passes on the content-complete build; P0/P1 remediated before PR
+- Mason walk gate on every compiled building; `GOGI_THRESHOLD_STEP` must not print for any
+  enterable at its placed site; interior-fit gate (`check-interiors.mjs`) on the dressing.
+- qgcheck winnability; `verify.mjs` smoke + FEEL + packaging/GPU/engine-currency gates on the
+  shipped `out/` (exit 0).
+- Targeted checks: hero facing, attack HP delta + particles, enemy engages, boss spawns INSIDE the
+  cave, chapel walk-in, truck climbs the switchback, portrait + landscape fill.
+- Game-Feel + QA specialist passes on the content-complete export; P0/P1 remediated and re-proven.
 
 # Out of scope
 
-- Multiplayer / auth / any Supabase backend (single-player, `user://` saves only)
-- True enemy projectiles with cover-seeking AI (engine enemies are stand-off melee at
-  `enemy_range`; rifle smugglers fire from range visually, disclosed in the PR)
-- Diagonal road strips (roads are ns/ew cell legs; the switchback is a staircase of legs)
+- Multiplayer / auth / Supabase (single-player, `user://` saves).
+- Terrain re-sculpt (heights are kept so every existing building stays grounded).
+- Any engine `.gd` patch — engine defects are reported under ENGINE BUG in the PR body.

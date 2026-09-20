@@ -418,6 +418,7 @@ func _process(_delta: float) -> void:
 			var scene := doc.generate_scene(st)
 			GSurf.cap_textures_for_web(scene)   # mobile VRAM: shrink Meshy textures ONCE per template (web only)
 			GSurf.fix_rigger_materials(scene)   # undo the Meshy rigger's metallic-1.0 + albedo-as-emission defaults
+			GSurf.fix_untextured_props(scene, item["url"])   # and give the texture-less library kits a real surface
 			_cache_put(item["url"], scene)
 			_inflight.erase(item["url"])
 			_retry.erase(item["url"])   # a later re-download (LRU eviction) gets fresh retries
@@ -464,6 +465,7 @@ func _process_threaded() -> void:
 		if scene != null:
 			GSurf.cap_textures_for_web(scene)   # no-op off-web; kept for a single shared code path
 			GSurf.fix_rigger_materials(scene)
+			GSurf.fix_untextured_props(scene, url)
 			_cache_put(url, scene)
 			_inflight.erase(url)
 			_retry.erase(url)

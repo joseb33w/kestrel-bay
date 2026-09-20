@@ -49,7 +49,8 @@ const TIME := {
 }
 
 # Weather modifiers layered on the time-of-day base.
-#   desat  : desaturate + grey the sky colours (overcast look — ProceduralSky has no clouds)
+#   desat  : desaturate + grey the sky colours
+#   cloud  : 0..1 cover for the sky's cloud layer (see _cloud_tex) — 0 is a bare gradient
 #   bright : push the sky toward white (overcast) or black (storm)
 #   light  : multiplier on sun + ambient energy
 #   fog    : distance-fog density (0 = off); NEVER volumetric
@@ -58,13 +59,13 @@ const WX := {
 	# FOG densities cut hard (was fog 0.032 / rain 0.011 / storm 0.015 / ...): the old "fog" preset was a
 	# pea-soup white-out that, at sunrise, washed the whole daytime scene warm/hazy. Distance fog is kept only
 	# LIGHT — enough to soften the far streaming edge, never enough to veil the daytime world. "clear" stays 0.
-	"clear":    {"desat": 0.0, "bright": 0.0,  "light": 1.0,  "fog": 0.0,    "part": "",     "audio": "",     "storm": false},
-	"cloudy":   {"desat": 0.35, "bright": 0.18, "light": 0.82, "fog": 0.0012, "part": "",     "audio": "",     "storm": false},
-	"overcast": {"desat": 0.6,  "bright": 0.3,  "light": 0.6,  "fog": 0.004,  "part": "",     "audio": "wind", "storm": false},
-	"fog":      {"desat": 0.45, "bright": 0.22, "light": 0.7,  "fog": 0.010,  "part": "",     "audio": "wind", "storm": false},
-	"rain":     {"desat": 0.55, "bright": 0.05, "light": 0.55, "fog": 0.006,  "part": "rain", "audio": "rain", "storm": false},
-	"storm":    {"desat": 0.65, "bright": -0.12, "light": 0.42, "fog": 0.009,  "part": "rain", "audio": "rain", "storm": true},
-	"snow":     {"desat": 0.4,  "bright": 0.28, "light": 0.82, "fog": 0.008,  "part": "snow", "audio": "wind", "storm": false},
+	"clear":    {"desat": 0.0, "bright": 0.0,  "light": 1.0,  "fog": 0.0,    "cloud": 0.10, "part": "",     "audio": "",     "storm": false},
+	"cloudy":   {"desat": 0.35, "bright": 0.18, "light": 0.82, "fog": 0.0012, "cloud": 0.55, "part": "",     "audio": "",     "storm": false},
+	"overcast": {"desat": 0.6,  "bright": 0.3,  "light": 0.6,  "fog": 0.004,  "cloud": 0.92, "part": "",     "audio": "wind", "storm": false},
+	"fog":      {"desat": 0.45, "bright": 0.22, "light": 0.7,  "fog": 0.010,  "cloud": 0.75, "part": "",     "audio": "wind", "storm": false},
+	"rain":     {"desat": 0.55, "bright": 0.05, "light": 0.55, "fog": 0.006,  "cloud": 0.88, "part": "rain", "audio": "rain", "storm": false},
+	"storm":    {"desat": 0.65, "bright": -0.12, "light": 0.42, "fog": 0.009,  "cloud": 1.0,  "part": "rain", "audio": "rain", "storm": true},
+	"snow":     {"desat": 0.4,  "bright": 0.28, "light": 0.82, "fog": 0.008,  "cloud": 0.85, "part": "snow", "audio": "wind", "storm": false},
 }
 
 var env: Environment
@@ -95,6 +96,13 @@ func setup(environment: Environment, sun_light: DirectionalLight3D, cam_node: No
 	_sky_mat = ProceduralSkyMaterial.new()
 	_sky_mat.sun_angle_max = 9.0
 	_sky_mat.sky_energy_multiplier = 1.0
+	# CLOUDS. ProceduralSkyMaterial is a three-stop vertical gradient and nothing else, so until
+	# now every sky in every game — clear, overcast, storm — was the same gradient at a different
+	# saturation, with no cloud detail at any time of day. `sky_cover` blends a panorama over it,
+	# and it is accepted on gl_compatibility (measured against the shipped 4.7.1 binary under
+	# --rendering-driver opengl3: no warning; only ssil/ssr/sdfgi/volumetric_fog warn there).
+	# Generated rather than shipped as an asset: no download, no cache slot, no VRAM budget line.
+	_sky_mat.sky_cover = _cloud_tex()
 	var sky := Sky.new()
 	sky.sky_material = _sky_mat
 	env.background_mode = Environment.BG_SKY
@@ -206,6 +214,7 @@ func _process(delta: float) -> void:
 	# the FX rig rides above the camera so rain/snow always surround the player
 	if cam:
 		_fx.global_position = cam.global_position + Vector3(0.0, 11.0, 0.0)
+	_update_indoor(delta)
 	_apply_now()
 
 
@@ -216,6 +225,10 @@ func _apply_now() -> void:
 		sun.light_energy = clampf(float(_cur.get("sun_energy", 1.0)) + _flash * 2.5, 0.0, 1.5)
 		sun.light_color = _cur.get("sun_color", Color.WHITE)
 	if _sky_mat:
+		# alpha carries the cover: 0 hides the layer entirely, so a clear sky stays a clean gradient
+		var cc: Color = _cur.get("cloud_col", Color(1, 1, 1))
+		cc.a = clampf(float(_cur.get("cloud", 0.0)), 0.0, 1.0)
+		_sky_mat.sky_cover_modulate = cc
 		_sky_mat.sky_top_color = _cur.get("top", Color(0.28, 0.52, 0.92))
 		_sky_mat.sky_horizon_color = _cur.get("horizon", Color(0.74, 0.84, 0.98))
 		_sky_mat.ground_horizon_color = _cur.get("horizon", Color(0.74, 0.84, 0.98))
@@ -247,10 +260,43 @@ func _resolve(time: String, weather: String) -> Dictionary:
 		"ambient": _wx_col(t["ambient"], desat * 0.6, bright * 0.4),
 		"ambient_energy": float(t["ambient_energy"]) * lerpf(1.0, float(w["light"]), 0.6),
 		"fog": float(w["fog"]),
+		# Cloud COVER lerps like every other number here, so a weather change rolls in rather than
+		# cutting. The cloud COLOUR is the time-of-day horizon pushed by the same weather terms —
+		# so clouds catch the sunrise, grey out under overcast, and go near-black in a storm,
+		# instead of being a white overlay pasted on every sky.
+		"cloud": float(w.get("cloud", 0.0)),
+		"cloud_col": _wx_col(t["horizon"].lerp(Color(1, 1, 1), 0.35), desat * 0.7, bright * 0.8),
 	}
 
 
-# Desaturate toward grey, then push toward white (overcast) or black (storm).
+## A seamless cloud panorama, generated at boot. Two octaves of FastNoiseLite ridged noise shaped
+## by a gradient so the texture is mostly TRANSPARENT with denser patches — a flat 50% grey sheet
+## would read as smog, not weather. 512 px is plenty: it is stretched across the whole sky and
+## viewed through a gradient, and it costs ~1 MB against the 320 px prop-texture cap.
+func _cloud_tex() -> NoiseTexture2D:
+	var n := FastNoiseLite.new()
+	n.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	n.frequency = 0.004
+	n.fractal_type = FastNoiseLite.FRACTAL_FBM
+	n.fractal_octaves = 4
+	n.fractal_gain = 0.45
+	var g := Gradient.new()
+	# Alpha ramp, not a colour ramp: most of the field is open sky, the top third is cloud, and the
+	# edges feather. White RGB because sky_cover_modulate supplies the actual colour per weather.
+	g.offsets = PackedFloat32Array([0.0, 0.42, 0.62, 1.0])
+	g.colors = PackedColorArray([
+		Color(1, 1, 1, 0.0), Color(1, 1, 1, 0.0), Color(1, 1, 1, 0.75), Color(1, 1, 1, 1.0)])
+	var t := NoiseTexture2D.new()
+	t.noise = n
+	t.width = 512
+	t.height = 512
+	t.seamless = true
+	t.generate_mipmaps = true
+	t.color_ramp = g
+	return t
+
+
+# Desaturate toward grey, then push toward white (overcast) or black (storm).# Desaturate toward grey, then push toward white (overcast) or black (storm).
 func _wx_col(c: Color, desat: float, bright: float) -> Color:
 	var g := c.v
 	var grey := Color(g, g, g, 1.0)
@@ -262,14 +308,67 @@ func _wx_col(c: Color, desat: float, bright: float) -> Color:
 	return out
 
 
+## ---- RAIN DOES NOT FALL INDOORS -----------------------------------------------------------
+##
+## The emitter is parked 11 m above the camera and rains straight down, and NOTHING anywhere in
+## this file ever asked whether there is a roof in the way. So it rained, and snowed, inside every
+## building in every weather world ever shipped — in a pub, in a chapel, down a lighthouse stair.
+## It is the kind of thing that is invisible in a screenshot of the outdoors and unmissable the
+## moment a player walks through a door.
+##
+## The test is one ray straight up from the camera. If it meets world geometry, there is something
+## overhead and precipitation stops; when it clears, precipitation resumes. Deliberately the
+## camera and not the player: the camera is what the frame is drawn from, so it is what decides
+## whether a raindrop would be visible, and it keeps the third-person rig honest when it pulls
+## back through a doorway.
+##
+## Throttled, because a ray per frame per player is real cost for a question whose answer changes
+## about once a minute, and hysteresis-free on purpose — a doorway should switch cleanly, and the
+## throttle already absorbs the flicker a threshold would have been added to hide.
+const INDOOR_PROBE_UP := 40.0     # a cathedral nave is tall; a roof above this is not shelter
+const INDOOR_PROBE_HZ := 6.0      # tests per second
+var _want_rain := false
+var _want_snow := false
+var _indoors := false
+var _probe_t := 0.0
+
+
+func _update_indoor(delta: float) -> void:
+	if cam == null or not is_instance_valid(cam) or not (_want_rain or _want_snow):
+		return
+	_probe_t -= delta
+	if _probe_t > 0.0:
+		return
+	_probe_t = 1.0 / INDOOR_PROBE_HZ
+	var world := cam.get_world_3d()
+	if world == null:
+		return
+	var from := cam.global_position
+	var q := PhysicsRayQueryParameters3D.create(from, from + Vector3(0.0, INDOOR_PROBE_UP, 0.0), 1)
+	q.collide_with_areas = false
+	var inside := not world.direct_space_state.intersect_ray(q).is_empty()
+	if inside != _indoors:
+		_indoors = inside
+		_apply_precip()
+
+
+func _apply_precip() -> void:
+	if _rain != null:
+		_rain.emitting = _want_rain and not _indoors
+	if _snow != null:
+		_snow.emitting = _want_snow and not _indoors
+
+
 func _switch_weather(weather: String) -> void:
 	if weather == _active_wx:
 		return
 	_active_wx = weather
 	var w: Dictionary = WX.get(weather, WX["clear"])
 	var part := String(w["part"])
-	_rain.emitting = part == "rain"
-	_snow.emitting = part == "snow"
+	_want_rain = part == "rain"
+	_want_snow = part == "snow"
+	_probe_t = 0.0        # re-test the roof on the next frame rather than trusting a stale verdict
+	_apply_precip()
 	if w["storm"]:
 		_bolt_t = randf_range(2.0, 5.0)
 	# WEATHER AUDIO BED — on AudioManager's dedicated weather channel, never play_ambient().

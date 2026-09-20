@@ -152,7 +152,11 @@ func add_chest(pos: Vector3, contents: Array, gold := 0, parent: Node = null, ce
 		contents = contents, gold = gold, opened = false, cell = cell_key})
 
 
-func add_npc(pos: Vector3, npc_id: String, npc_name: String, persona: String, lines: Array, model: Node = null, parent: Node = null, cell_key := "", sound := "", gender := "", age := "") -> void:
+## `activity` names the ambient clip this NPC should loop (see _idle_animate); `holds` is a model
+## to put in their hand. They go together on purpose: an activity clip that acts on an object and
+## no object is the "miming with empty hands" defect, so the vocabulary that asks for one asks for
+## the other in the same breath.
+func add_npc(pos: Vector3, npc_id: String, npc_name: String, persona: String, lines: Array, model: Node = null, parent: Node = null, cell_key := "", sound := "", gender := "", age := "", activity := "", holds: Node = null, seated := false) -> void:
 	var par: Node = parent if parent != null else area_parent
 	if model and model is Node3D:
 		var m3 := model as Node3D
@@ -161,10 +165,22 @@ func add_npc(pos: Vector3, npc_id: String, npc_name: String, persona: String, li
 		# SEAT the character so feet rest on the floor. Character GLB origins sit at the hips, so the
 		# model sinks to the knees unless we LIFT it (unlike props, which we only ever drop). This is
 		# the NPC-side of the player's _seat_avatar — full seat, both lift and drop, no maxf clamp.
-		# _subtree_aabb is WORLD-space, so subtract the model's own world height first — otherwise the
-		# feet land at world y=0 regardless of `pos` (fine on a flat zone floor, buried on terrain).
+		# _subtree_aabb is WORLD-space. Subtracting it raw sets the feet to world y=0 regardless of
+		# `pos`, which is invisible on a flat zone floor and buries every NPC on terrain (measured:
+		# all 8 authored NPCs of one build at y=0, under the ground, with their collider capsules
+		# left behind at the right height as invisible walls). Subtract the model's OWN world height
+		# first, so what is removed is the LOCAL distance from origin to lowest vertex.
 		m3.position.y -= _subtree_aabb(m3).position.y - m3.global_position.y
-		_idle_animate(m3)
+		# HAND FIRST, THEN THE CLIP — so a lifting NPC has the crate before it starts lifting.
+		if holds != null and holds is Node3D:
+			GEquip.equip(m3, {"name": String(holds.name), "kind": "prop"}, holds as Node3D)
+		elif activity != "" and _implies_prop(activity):
+			push_warning("GOGI_NPC_EMPTY_HANDS %s asks for activity \"%s\", which acts on an "
+				% [npc_name, activity] + "object, but no `holds` model was given — they will mime it.")
+			print("GOGI_NPC_EMPTY_HANDS ", npc_id, " ", activity)
+		# An authored seated ACTIVITY is itself a statement that they are sitting, so an author who
+		# writes `activity: "sit"` does not also have to write `seated: true`.
+		_idle_animate(m3, activity, seated or _implies_seat(activity))
 	else:
 		_capsule(pos, Color(0.30, 0.78, 0.42), par)
 	# SOLID body so the player can't walk THROUGH the NPC
@@ -1023,20 +1039,81 @@ func _mat(c: Color) -> StandardMaterial3D:
 # AnimationPlayer with idle/walk/...) loop their idle so generated people don't stand frozen.
 # KayKit library models import an EMPTY AnimationPlayer (no clips) -> this no-ops and they stay
 # static, exactly as before (zero regression). No external rig libraries required.
-func _idle_animate(model: Node) -> void:
+## Clip families that are a LIE WITHOUT A PROP. Every one of these depicts the character acting on
+## an object — lifting a crate, swinging an axe, hauling a rope — so playing one with empty hands
+## produces the thing players actually report: "an npc doing the lifting animation but not lifting
+## anything". They are never chosen automatically. An author can still ASK for one by naming an
+## `activity`, which is the moment to also give the NPC something to hold.
+const PROP_IMPLYING_CLIPS := [
+	"lift", "carry", "haul", "pull", "push", "drag", "throw", "dig", "chop", "axe", "hammer",
+	"saw", "mine", "pick", "fish", "row", "paddle", "pour", "drink", "eat", "cook", "write",
+	"sweep", "clean", "plant", "harvest", "hold", "use", "craft", "repair", "build", "aim",
+	"shoot", "fire", "reload", "attack", "melee", "swing", "slash", "stab", "punch", "kick",
+	"die", "death", "hit", "hurt", "damage", "fall", "jump", "climb", "swim", "drive",
+]
+
+## Clip names that read as a person simply BEING somewhere. Preferred, in order, when no activity
+## was authored and the rig has no clip actually called "idle".
+const STANDING_CLIPS := ["idle", "stand", "breath", "wait", "loop", "talk", "look", "rest"]
+
+## Clips that only make sense with something UNDER the character. A seated idle played by someone
+## standing in the middle of a room puts their legs out in front and their back where a chair
+## would be, so they read as lying in mid-air at a broken angle — which is exactly how a pub
+## regular shipped, and it is indistinguishable from a corrupt asset at a glance. It is not: the
+## model was clean and its ONLY clip was `idle_sitting`, because it was generated to be a seated
+## character. "idle" is a SUBSTRING of "idle_sitting", so the preference above picked it happily.
+## These are used only when the NPC is actually on a seat, or when an author names one explicitly.
+const SEATED_CLIPS := ["sit", "seat", "sitting", "kneel", "lie", "lying", "sleep", "prone", "crouch"]
+
+
+## Choose and loop this character's ambient clip.
+##
+## THE OLD DEFAULT WAS `clips[0]` — whatever happened to come first in the rig's animation list —
+## used whenever no clip name contained "idle". That was survivable while rigs shipped two or three
+## clips and one of them was called Idle. Widening the generated clip sets made it actively wrong:
+## clips[0] on a Meshy character is now as likely to be a carry or a chop as anything else, so a
+## townsperson stands in the square miming a lift with nothing in their hands. Nobody chose that —
+## it is alphabetical order leaking into the world.
+##
+## `activity` is the authored answer: a world that wants a dockhand hauling says so, and pairs it
+## with something to hold. Everything unauthored falls back through STANDING_CLIPS and then to the
+## procedural breathe — never to a clip that implies a prop.
+func _idle_animate(model: Node, activity := "", seated := false) -> void:
 	var ap := _find_anim_player(model)
 	if ap != null and not ap.get_animation_list().is_empty():
 		var clips := ap.get_animation_list()
-		var pick := String(clips[0])
-		for n in clips:
-			if "idle" in String(n).to_lower():
+		var pick := ""
+		if activity != "":
+			pick = _match_clip(clips, [activity.to_lower()])
+			if pick == "":
+				push_warning("GOGI_NPC_ACTIVITY \"%s\" — this rig has no such clip; standing instead" % activity)
+				print("GOGI_NPC_ACTIVITY_MISSING ", activity)
+		if pick == "":
+			pick = _match_clip(clips, STANDING_CLIPS, not seated)
+		if pick == "":
+			# Nothing that reads as standing. Take any clip that does NOT imply a prop rather than
+			# the first one in the list — a wave or a talk loop is a fine ambient, a chop is not.
+			for n in clips:
+				if _implies_prop(String(n)):
+					continue
+				if not seated and _implies_seat(String(n)):
+					continue
 				pick = String(n)
 				break
-		var a := ap.get_animation(pick)
-		if a != null:
-			a.loop_mode = Animation.LOOP_LINEAR
-		ap.play(pick)
-		return
+		if pick == "" and not seated:
+			# EVERY clip on this rig needs a seat or a prop. Standing there in the bind pose or
+			# miming a chair both look broken; the procedural breathe does not. SAY SO, because a
+			# standing role cast with a seated-only character is a casting mistake upstream.
+			push_warning("GOGI_NPC_SEATED_ONLY this rig has only seated/prop clips (%s) but the NPC "
+				% ", ".join(clips) + "is not on a seat — using a procedural idle instead.")
+			print("GOGI_NPC_SEATED_ONLY ", ",".join(clips))
+		if pick != "":
+			var a := ap.get_animation(pick)
+			if a != null:
+				a.loop_mode = Animation.LOOP_LINEAR
+			ap.play(pick)
+			return
+		# Every clip on this rig implies a prop. Breathing beats miming.
 	# NO clips (KayKit/Kenney library rigs import an EMPTY AnimationPlayer) -> a PROCEDURAL idle so
 	# the character subtly breathes/sways instead of standing dead-frozen (frozen crowds read as
 	# lifeless cardboard). A real walk/idle clip from the rig always wins over this.
@@ -1055,6 +1132,35 @@ func _procedural_idle(model: Node) -> void:
 		if is_instance_valid(m):
 			m.position.y = base_y + sin(t) * 0.025,
 		phase, phase + TAU, 2.4).set_trans(Tween.TRANS_LINEAR)
+
+
+## First clip whose name contains any of `keys`, in KEY order (so "idle" beats "stand").
+## `no_seated` skips clips that need something under the character — "idle" matches "idle_sitting".
+func _match_clip(clips: PackedStringArray, keys: Array, no_seated := false) -> String:
+	for k in keys:
+		for n in clips:
+			if not (String(k) in String(n).to_lower()):
+				continue
+			if no_seated and _implies_seat(String(n)):
+				continue
+			return String(n)
+	return ""
+
+
+func _implies_seat(clip_name: String) -> bool:
+	var lc := clip_name.to_lower()
+	for k in SEATED_CLIPS:
+		if String(k) in lc:
+			return true
+	return false
+
+
+func _implies_prop(clip_name: String) -> bool:
+	var lc := clip_name.to_lower()
+	for k in PROP_IMPLYING_CLIPS:
+		if String(k) in lc:
+			return true
+	return false
 
 
 func _find_anim_player(n: Node) -> AnimationPlayer:

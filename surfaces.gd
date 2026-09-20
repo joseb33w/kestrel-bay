@@ -105,6 +105,121 @@ static func _fix_material(m: Material, seen: Dictionary) -> int:
 	return 1
 
 
+## ---- THE UNTEXTURED-LIBRARY REPAIR ------------------------------------------------------------
+##
+## A sibling of fix_rigger_materials, and the same argument in a different place.
+##
+## Measured on the live `vostok_extra` kit — the realistic prop set art.md sends every survival /
+## coastal / modern / horror build to: 17 of 17 GLBs sampled ship `textures: 0`, `images: 0`, and
+## one material whose baseColorFactor is the glTF DEFAULT [0.8, 0.8, 0.8, 1]. Not dark, not
+## flat-lit: no albedo at all. So every table, crate, cabinet, sofa, pallet and mattress in the kit
+## renders as the same white plastic, and a player reads it instantly as "the furniture is all
+## white". A world dressed from this kit cannot look finished no matter how well it is placed.
+##
+## THE FINGERPRINT has to be something an artist would never author, exactly as the rigger's
+## albedo-as-emission alias is. Neither half qualifies alone — a plain painted colour with no map
+## is legitimate, and 0.8 grey is legitimate. Both AT ONCE on a library asset is only ever an
+## export that dropped its images: nobody picks 0.800000 grey deliberately and then also ships no
+## texture. That conjunction is the trigger, and nothing else is touched.
+##
+## WHAT REPLACES IT is a real triplanar GSurf surface chosen from the asset's own NAME — the only
+## description of the object that survived the export. Scored rather than first-match, because the
+## names are compounds and a single keyword lies: "MS_Fence_Wood_Pole" hits `pole` (metal) once and
+## `fence`+`wood` (wood) twice, and the answer is wood. A name that scores nothing falls back to
+## wood, the commonest material in a prop kit and never worse than white plastic.
+##
+## Same deal as the rigger repair on reach: done ON LOAD, so no asset needs regenerating, but a
+## game already exported carries the engine it was born with until its next build.
+const PROP_MATERIAL_HINTS := [
+	["glass",   ["glass", "window", "bottle", "jar", "mirror", "pane", "vial"]],
+	["fabric",  ["sofa", "couch", "armchair", "mattress", "bed", "cushion", "pillow", "curtain",
+				 "rug", "carpet", "cloth", "sack", "blanket", "towel", "sleeping", "hammock"]],
+	["canvas",  ["tent", "tarp", "sail", "awning", "banner", "flag", "canopy", "net"]],
+	["leather", ["leather", "saddle", "boot", "belt", "satchel", "holster"]],
+	["rust",    ["rust", "rusty", "wreck", "wrecked", "scrap", "junk", "derelict", "corroded"]],
+	["stone",   ["stone", "rock", "brick", "fireplace", "concrete", "statue", "grave", "monument",
+				 "well", "chimney", "boulder", "kerb", "curb"]],
+	["plastic", ["plastic", "radio", "tv", "television", "phone", "cooler", "canister", "bin",
+				 "helmet", "toy", "keyboard", "monitor"]],
+	["metal",   ["metal", "steel", "iron", "barrel", "drum", "tank", "pipe", "rail", "pole",
+				 "lamp", "light", "sign", "barrier", "reel", "radiator", "stove", "locker",
+				 "anchor", "chain", "grate", "bucket", "kettle", "wire", "cable", "machine",
+				 "generator", "engine", "gas", "propane", "antenna", "mast", "girder", "valve"]],
+	["wood",    ["wood", "wooden", "timber", "plank", "crate", "pallet", "table", "chair",
+				 "cabinet", "shelf", "bench", "door", "box", "log", "fence", "post", "stool",
+				 "desk", "cart", "wheel", "ladder", "beam", "stair", "bookcase", "wardrobe",
+				 "drawer", "frame", "barrel_wood", "pier", "jetty", "deck", "hut", "cabin"]],
+]
+
+## glTF's default baseColorFactor. Compared with a tolerance because the float round-trips.
+const GLTF_DEFAULT_ALBEDO := 0.8
+const GLTF_DEFAULT_EPS := 0.02
+
+
+## Repair a freshly-parsed library GLB that shipped with no textures. `url` is the asset it came
+## from — the filename is the best name hint there is. Returns the number of materials replaced.
+static func fix_untextured_props(root: Node, url := "") -> int:
+	if root == null:
+		return 0
+	# Mason compiles its own geometry and _mason_materials owns its surfaces by spec; repairing it
+	# here first would be work thrown away and would guess where the record already knows.
+	if url.find("/mason/") >= 0:
+		return 0
+	var hint := url.get_file().get_basename().to_lower()
+	return _untex_walk(root, hint, {})
+
+
+static func _untex_walk(node: Node, hint: String, seen: Dictionary) -> int:
+	var n := 0
+	var mi := node as MeshInstance3D
+	if mi != null and mi.mesh != null:
+		var local := hint + " " + String(mi.name).to_lower()
+		for i in mi.mesh.get_surface_count():
+			var m := mi.mesh.surface_get_material(i)
+			if not _is_stripped(m, seen):
+				continue
+			var nm := local
+			if m != null:
+				nm += " " + String((m as Resource).resource_name).to_lower()
+			mi.mesh.surface_set_material(i, surface(preset_for_name(nm)))
+			n += 1
+	for c in node.get_children():
+		n += _untex_walk(c, hint, seen)
+	return n
+
+
+## The fingerprint: no albedo map AND the untouched glTF default grey. See the header.
+static func _is_stripped(m: Material, seen: Dictionary) -> bool:
+	var bm := m as BaseMaterial3D
+	if bm == null:
+		return false
+	if seen.has(bm):
+		return bool(seen[bm])
+	var a := bm.albedo_color
+	var stripped := (bm.get_texture(BaseMaterial3D.TEXTURE_ALBEDO) == null
+		and absf(a.r - GLTF_DEFAULT_ALBEDO) < GLTF_DEFAULT_EPS
+		and absf(a.g - GLTF_DEFAULT_ALBEDO) < GLTF_DEFAULT_EPS
+		and absf(a.b - GLTF_DEFAULT_ALBEDO) < GLTF_DEFAULT_EPS)
+	seen[bm] = stripped
+	return stripped
+
+
+## Best-scoring preset for a (lowercased) asset/material/node name. Public so the verifier's
+## asset lint and the Interiors specialist can ask the same question the engine will answer.
+static func preset_for_name(name_lc: String) -> String:
+	var best := "wood"
+	var best_score := 0
+	for row in PROP_MATERIAL_HINTS:
+		var score := 0
+		for kw in (row[1] as Array):
+			if name_lc.find(String(kw)) >= 0:
+				score += 1
+		if score > best_score:
+			best_score = score
+			best = String(row[0])
+	return best
+
+
 static func cap_textures_for_web(root: Node) -> void:
 	if root == null or not OS.has_feature("web"):
 		return
@@ -187,7 +302,12 @@ const SURFACES := {
 	"timber":    {"color": [0.30, 0.20, 0.12], "rough": 0.75, "metal": 0.0, "bump": 0.4,  "tile": 2.5, "pat": "planks"},
 	"metal":     {"color": [0.62, 0.64, 0.68], "rough": 0.35, "metal": 0.9, "bump": 0.12, "tile": 4.0, "pat": ""},
 	"steel":     {"color": [0.50, 0.52, 0.56], "rough": 0.45, "metal": 0.85,"bump": 0.12, "tile": 4.0, "pat": ""},
-	"glass":     {"color": [0.30, 0.42, 0.5],  "rough": 0.08, "metal": 0.5, "bump": 0.0,  "tile": 6.0, "pat": ""},
+	# GLASS IS TRANSPARENT NOW, which it was not. It was an opaque dark blue-grey panel with
+	# metallic 0.5 — so a window filled with it read as a slab of dark metal, and the one material
+	# whose entire point is that you see through it was the one material you could not. Nothing in
+	# the surface path had ever set BaseMaterial3D.transparency (see `alpha` in _resolve/surface).
+	# Metallic drops to 0: a metallic alpha surface in Godot goes to near-black.
+	"glass":     {"color": [0.56, 0.68, 0.74], "rough": 0.06, "metal": 0.0, "bump": 0.0,  "tile": 6.0, "pat": "", "alpha": 0.26},
 	"asphalt":   {"color": [0.12, 0.12, 0.14], "rough": 0.82, "metal": 0.0, "bump": 0.28, "tile": 6.0, "pat": "mottle"},
 	"sand":      {"color": [0.80, 0.69, 0.47], "rough": 0.97, "metal": 0.0, "bump": 0.55, "tile": 5.0, "pat": "mottle"},
 	"grass":     {"color": [0.30, 0.48, 0.23], "rough": 1.0,  "metal": 0.0, "bump": 0.45, "tile": 6.0, "pat": "mottle"},
@@ -200,6 +320,39 @@ const SURFACES := {
 	# could not be surfaced by name.
 	"stone":     {"color": [0.58, 0.56, 0.52], "rough": 0.92, "metal": 0.0, "bump": 0.5,  "tile": 3.0, "pat": "ashlar"},
 	"slate":     {"color": [0.27, 0.29, 0.33], "rough": 0.62, "metal": 0.0, "bump": 0.35, "tile": 1.8, "pat": "tiles"},
+	# GROUND NAMES EVERY COASTAL / OLD-TOWN WORLD REACHES FOR, and the two that were missing when a
+	# cliff-town build authored 170 "rock" cells and 25 "cobble" ones: both fell through to the grey
+	# mottle default, so every cliff rendered as smooth white-grey and the whole quay as a flat
+	# plane. Nothing said so — see the unresolved-preset warning in _resolve.
+	"rock":      {"color": [0.44, 0.43, 0.41], "rough": 0.95, "metal": 0.0, "bump": 0.75, "tile": 3.5, "pat": "mottle"},
+	"cobble":    {"color": [0.40, 0.39, 0.38], "rough": 0.86, "metal": 0.0, "bump": 0.65, "tile": 1.1, "pat": "brick"},
+	"gravel":    {"color": [0.46, 0.44, 0.41], "rough": 0.98, "metal": 0.0, "bump": 0.7,  "tile": 2.2, "pat": "mottle"},
+	# NON-MASONRY PROP MATERIALS. A prop kit is mostly not walls: fix_untextured_props needs a
+	# sofa to come back as cloth and a mattress not to come back as oak.
+	"fabric":    {"color": [0.42, 0.40, 0.38], "rough": 0.96, "metal": 0.0, "bump": 0.3,  "tile": 1.2, "pat": "fiber"},
+	"canvas":    {"color": [0.58, 0.54, 0.44], "rough": 0.94, "metal": 0.0, "bump": 0.35, "tile": 1.6, "pat": "fiber"},
+	"leather":   {"color": [0.33, 0.22, 0.15], "rough": 0.72, "metal": 0.0, "bump": 0.25, "tile": 1.4, "pat": "mottle"},
+	"plastic":   {"color": [0.38, 0.40, 0.43], "rough": 0.42, "metal": 0.0, "bump": 0.05, "tile": 3.0, "pat": ""},
+	"rust":      {"color": [0.42, 0.24, 0.14], "rough": 0.93, "metal": 0.35,"bump": 0.45, "tile": 2.0, "pat": "mottle"},
+	# THE SEVEN NAMES THE PLAYBOOK ALREADY TELLS AUTHORS TO USE AND THIS TABLE DID NOT HAVE.
+	# world-streaming.md lists fifteen ground presets. AreaBuilder.GROUND_PRESETS — the ZONE path —
+	# has all fifteen. SURFACES — the TERRAIN and chunk path, which is what nearly every world
+	# actually runs on — had eight, so an author following the documentation to the letter got flat
+	# grey for the other seven and nothing said why. That is the same defect as the 195-cell grey
+	# coast, still live for `desert`, `dune`, `road`, `sidewalk`, `mud`, `snow` and `water`.
+	# Values are the GROUND_PRESETS colours (already tuned and shipped on the zone path) with tile
+	# and pattern expressed in THIS table's units, so the two paths finally agree on what a name means.
+	"desert":    {"color": [0.75, 0.63, 0.42], "rough": 0.97, "metal": 0.0, "bump": 0.55, "tile": 5.5, "pat": "mottle"},
+	"dune":      {"color": [0.80, 0.69, 0.47], "rough": 0.97, "metal": 0.0, "bump": 0.70, "tile": 6.5, "pat": "mottle"},
+	"road":      {"color": [0.11, 0.11, 0.13], "rough": 0.80, "metal": 0.0, "bump": 0.28, "tile": 6.0, "pat": "mottle"},
+	"sidewalk":  {"color": [0.54, 0.54, 0.57], "rough": 0.90, "metal": 0.0, "bump": 0.22, "tile": 1.6, "pat": "tiles"},
+	"mud":       {"color": [0.30, 0.24, 0.17], "rough": 0.70, "metal": 0.0, "bump": 0.45, "tile": 4.5, "pat": "mottle"},
+	# Snow sits just under ALBEDO_MAX (0.85) on purpose: at the clamp all three channels flatten to
+	# the same value and the cold blue tint that makes snow read as snow is lost.
+	"snow":      {"color": [0.82, 0.84, 0.85], "rough": 0.65, "metal": 0.0, "bump": 0.35, "tile": 5.0, "pat": "mottle"},
+	# Ground-level water — a shallow, a puddle field, a flooded cell. NOT the animated ocean
+	# (water.gd owns that). Now that `alpha` exists it can actually be water rather than blue mud.
+	"water":     {"color": [0.16, 0.32, 0.42], "rough": 0.10, "metal": 0.0, "bump": 0.18, "tile": 8.0, "pat": "mottle", "alpha": 0.82},
 }
 
 # Per-channel albedo ceiling (see header). Applied ONLY where albedo is resolved (_resolve); never to emission.
@@ -256,6 +409,14 @@ static func surface(spec) -> StandardMaterial3D:
 			m.normal_enabled = true
 			m.normal_texture = _noise_normal(seed_i, p["bump"])
 			m.normal_scale = clampf(p["bump"], 0.0, 1.0)
+	# TRANSPARENCY, applied last so it works on both the patterned and the flat branch (a leaded
+	# window is a pattern with alpha; a plain pane is flat). Culling is deliberately left ON:
+	# Mason emits a pane as a thin SOLID with both faces, so two-sided rendering would double the
+	# fragment cost for nothing. A single-quad user who needs both sides can say so themselves.
+	var alpha := float(p.get("alpha", 1.0))
+	if alpha < 0.999:
+		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.albedo_color.a = alpha
 	_cache[key] = m
 	return m
 
@@ -338,27 +499,68 @@ static func sign_light(color: Color, energy: float = 2.0, light_range: float = 7
 
 # ─────────────────────────────── internals ───────────────────────────────
 
+## Names already reported as unresolved, so a 170-cell world logs each miss once rather than 170 times.
+static var _unknown_logged := {}
+
+## SAY WHEN A PRESET NAME DOES NOT EXIST.
+##
+## An unknown name fell through to the grey mottle default in silence, which is the worst possible
+## behaviour: the world looks built, the author sees flat grey and assumes it is the lighting, and
+## nothing in any log connects the two. One coastal build shipped 195 cells of ground this way —
+## "rock" and "cobble", neither of which was in the table. verify.mjs now FAILS on an unresolved
+## preset; this line is how it, and a human reading the console, finds out.
+static func _note_unknown(nm: String) -> void:
+	if nm == "" or _unknown_logged.has(nm):
+		return
+	_unknown_logged[nm] = true
+	push_warning("GOGI_SURFACE_UNKNOWN \"%s\" is not a surface preset — falling back to flat grey. " % nm
+		+ "Use a name from GSurf.SURFACES, or a dict spec {color, rough, metal, bump, tile, pat}.")
+	print("GOGI_SURFACE_UNKNOWN ", nm)
+
+
+## The resolved base COLOUR of a surface spec, with the albedo ceiling applied — i.e. what a wall
+## made of this will actually give back to a light. Public because lighting has to know: the same
+## omni is twice the picture on plaster as on timber, and a light that ignores the difference blows
+## one room out while leaving the other dim. See build_structure._room_light.
+static func albedo_of(spec) -> Color:
+	return _resolve(spec)["color"]
+
+
 static func _resolve(spec) -> Dictionary:
-	var out := {"color": Color(0.6, 0.6, 0.62), "rough": 0.85, "metal": 0.0, "bump": 0.25, "tile": 4.0, "pat": "mottle"}
+	var out := {"color": Color(0.6, 0.6, 0.62), "rough": 0.85, "metal": 0.0, "bump": 0.25, "tile": 4.0, "pat": "mottle", "alpha": 1.0}
+	if typeof(spec) == TYPE_STRING and not SURFACES.has(String(spec).to_lower()):
+		_note_unknown(String(spec).to_lower())
 	if typeof(spec) == TYPE_STRING and SURFACES.has(String(spec).to_lower()):
 		var pr: Dictionary = SURFACES[String(spec).to_lower()]
 		out["color"] = Color(pr["color"][0], pr["color"][1], pr["color"][2])
 		out["rough"] = pr["rough"]; out["metal"] = pr["metal"]; out["bump"] = pr["bump"]; out["tile"] = pr["tile"]
 		out["pat"] = pr.get("pat", "")
+		out["alpha"] = pr.get("alpha", 1.0)
 	elif typeof(spec) == TYPE_DICTIONARY:
 		var d: Dictionary = spec
 		var nm := String(d.get("preset", d.get("material", ""))).to_lower()
+		# A dict that names a preset AND overrides everything is fine; one that names a preset
+		# nobody has heard of and relies on it is the silent-grey case above.
+		if nm != "" and not SURFACES.has(nm) and not d.has("color"):
+			_note_unknown(nm)
 		if SURFACES.has(nm):
 			var pr2: Dictionary = SURFACES[nm]
 			out["color"] = Color(pr2["color"][0], pr2["color"][1], pr2["color"][2])
 			out["rough"] = pr2["rough"]; out["metal"] = pr2["metal"]; out["bump"] = pr2["bump"]; out["tile"] = pr2["tile"]
 			out["pat"] = pr2.get("pat", "")
+			out["alpha"] = pr2.get("alpha", 1.0)
 		if d.has("color"):
 			var c = d["color"]
 			out["color"] = Color(c[0], c[1], c[2])
 		for k in ["rough", "metal", "bump", "tile"]:
 			if d.has(k):
 				out[k] = float(d[k])
+		# ALPHA — the key the dict spec never had. Below 1.0 the material becomes alpha-blended,
+		# which is what makes glass, water-in-a-trough, a tent skin, an ice wall or a scrim
+		# expressible at all. It is NOT clamped by ALBEDO_MAX: that ceiling exists to stop albedo
+		# blowing out in daylight and has nothing to say about opacity.
+		if d.has("alpha"):
+			out["alpha"] = clampf(float(d["alpha"]), 0.0, 1.0)
 		# An explicit pattern (or "" for a flat colour) overrides the preset's family.
 		if d.has("pat"):
 			out["pat"] = String(d["pat"])
