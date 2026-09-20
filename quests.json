@@ -1,0 +1,95 @@
+{
+ "director_managed": true,
+ "quests": [
+  {
+   "id": "settle_in",
+   "name": "Settle In",
+   "giver": "harbour_master",
+   "steps": [
+    {
+     "id": "master",
+     "objective": {
+      "type": "talk_to",
+      "target": "harbour_master"
+     },
+     "desc": "Find Alwyn at the harbour office"
+    },
+    {
+     "id": "pub",
+     "objective": {
+      "type": "talk_to",
+      "target": "barmaid"
+     },
+     "desc": "Ask at the Kestrel Arms up the hill"
+    }
+   ],
+   "rewards": {
+    "xp": 40,
+    "gold": 20
+   },
+   "on_complete_flags": [
+    "met_town"
+   ]
+  },
+  {
+   "id": "smugglers",
+   "name": "The Marguerite",
+   "prereq": {
+    "quests": [
+     "settle_in"
+    ]
+   },
+   "steps": [
+    {
+     "id": "reach",
+     "objective": {
+      "type": "reach_area",
+      "target": "c9_-6"
+     },
+     "desc": "Reach the wreck down the coast"
+    },
+    {
+     "id": "gun",
+     "objective": {
+      "type": "collect",
+      "target": "shotgun"
+     },
+     "desc": "Take the shotgun from the stash by the wreck"
+    },
+    {
+     "id": "clear",
+     "objective": {
+      "type": "kill_count",
+      "target": "smuggler",
+      "count": 5
+     },
+     "desc": "Deal with the 5 smugglers"
+    },
+    {
+     "id": "boss",
+     "objective": {
+      "type": "kill_count",
+      "target": "ringleader",
+      "count": 1
+     },
+     "desc": "Take down the ringleader"
+    },
+    {
+     "id": "loot",
+     "objective": {
+      "type": "collect",
+      "target": "contraband"
+     },
+     "desc": "Take the contraband from the cave"
+    }
+   ],
+   "rewards": {
+    "xp": 300,
+    "gold": 200
+   },
+   "on_complete_flags": [
+    "cove_cleared"
+   ]
+  }
+ ]
+}
