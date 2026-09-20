@@ -12,7 +12,7 @@ godot
 .gogi-cache/
 
 # Mason toolchain (installed by run.sh; never commit)
-mason/
+/mason/
 # verify/preview tooling
 verify/
 playbooks/

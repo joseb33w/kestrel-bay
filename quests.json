@@ -12,7 +12,7 @@
       "type": "talk_to",
       "target": "harbour_master"
      },
-     "desc": "Find Alwyn at the harbour office"
+     "desc": "Find Alwyn in the harbour office"
     },
     {
      "id": "pub",
@@ -20,7 +20,7 @@
       "type": "talk_to",
       "target": "barmaid"
      },
-     "desc": "Ask at the Kestrel Arms up the hill"
+     "desc": "Ask Morwenna at the Kestrel Arms"
     }
    ],
    "rewards": {
@@ -54,7 +54,7 @@
       "type": "collect",
       "target": "shotgun"
      },
-     "desc": "Take the shotgun from the stash by the wreck"
+     "desc": "Take the shotgun from the stash"
     },
     {
      "id": "clear",
@@ -64,15 +64,6 @@
       "count": 5
      },
      "desc": "Deal with the 5 smugglers"
-    },
-    {
-     "id": "boss",
-     "objective": {
-      "type": "kill_count",
-      "target": "ringleader",
-      "count": 1
-     },
-     "desc": "Take down the ringleader"
     },
     {
      "id": "loot",
