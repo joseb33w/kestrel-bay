@@ -462,7 +462,7 @@
  {
   "id": "net_shed",
   "footprint": [
-   18,
+   15.8,
    10
   ],
   "floors": 1,
@@ -493,49 +493,49 @@
   "openings": [
    {
     "face": "s",
-    "centre": 0,
+    "centre": 0.0,
     "w": 2.4,
     "h": 2.5,
     "sill": 0
    },
    {
     "face": "s",
-    "centre": -4.5,
+    "centre": -3.95,
     "w": 0.9,
     "h": 0.9,
     "sill": 3.6
    },
    {
     "face": "s",
-    "centre": -7.5,
+    "centre": -6.58,
     "w": 0.9,
     "h": 0.9,
     "sill": 3.6
    },
    {
     "face": "s",
-    "centre": 4.5,
+    "centre": 3.95,
     "w": 0.9,
     "h": 0.9,
     "sill": 3.6
    },
    {
     "face": "s",
-    "centre": 7.5,
+    "centre": 6.58,
     "w": 0.9,
     "h": 0.9,
     "sill": 3.6
    },
    {
     "face": "n",
-    "centre": -4.0,
+    "centre": -3.51,
     "w": 0.9,
     "h": 0.9,
     "sill": 3.6
    },
    {
     "face": "n",
-    "centre": 4.0,
+    "centre": 3.51,
     "w": 0.9,
     "h": 0.9,
     "sill": 3.6
@@ -701,8 +701,8 @@
  {
   "id": "wreck",
   "footprint": [
-   24,
-   8
+   15.8,
+   7
   ],
   "floors": 1,
   "floor_height": 4.6,
@@ -717,8 +717,8 @@
    {
     "name": "hull",
     "footprint": [
-     24,
-     8
+     15.8,
+     7
     ],
     "at": [
      0,
@@ -747,11 +747,11 @@
    {
     "name": "deckhouse",
     "footprint": [
-     5,
-     8
+     4,
+     7
     ],
     "at": [
-     7,
+     4.4,
      0
     ],
     "profile": "vertical",
@@ -765,11 +765,11 @@
    {
     "name": "wheelhouse",
     "footprint": [
-     3.6,
-     4.6
+     3.0,
+     4.2
     ],
     "at": [
-     7.2,
+     4.6,
      0
     ],
     "profile": "vertical",
@@ -787,7 +787,7 @@
      0.9
     ],
     "at": [
-     -11.4,
+     -7.3,
      0
     ],
     "profile": "vertical",
@@ -803,7 +803,7 @@
    {
     "part": "hull",
     "face": "s",
-    "centre": -3.0,
+    "centre": -2.0,
     "w": 1.6,
     "h": 2.3,
     "sill": 0,
@@ -812,7 +812,7 @@
    {
     "part": "deckhouse",
     "face": "s",
-    "centre": -1.2,
+    "centre": -0.96,
     "w": 0.9,
     "h": 0.9,
     "sill": 5.5,
@@ -821,7 +821,7 @@
    {
     "part": "deckhouse",
     "face": "s",
-    "centre": 1.2,
+    "centre": 0.96,
     "w": 0.9,
     "h": 0.9,
     "sill": 5.5,
@@ -830,7 +830,7 @@
    {
     "part": "deckhouse",
     "face": "n",
-    "centre": -1.2,
+    "centre": -0.96,
     "w": 0.9,
     "h": 0.9,
     "sill": 5.5,
@@ -839,7 +839,7 @@
    {
     "part": "deckhouse",
     "face": "n",
-    "centre": 1.2,
+    "centre": 0.96,
     "w": 0.9,
     "h": 0.9,
     "sill": 5.5,
@@ -848,7 +848,7 @@
    {
     "part": "wheelhouse",
     "face": "w",
-    "centre": -1.1,
+    "centre": -0.99,
     "w": 0.9,
     "h": 1.0,
     "sill": 7.9,
@@ -857,7 +857,7 @@
    {
     "part": "wheelhouse",
     "face": "w",
-    "centre": 1.1,
+    "centre": 0.99,
     "w": 0.9,
     "h": 1.0,
     "sill": 7.9,
@@ -866,7 +866,7 @@
    {
     "part": "wheelhouse",
     "face": "s",
-    "centre": -0.9,
+    "centre": -0.72,
     "w": 0.9,
     "h": 1.0,
     "sill": 7.9,
@@ -875,7 +875,7 @@
    {
     "part": "wheelhouse",
     "face": "s",
-    "centre": 0.9,
+    "centre": 0.72,
     "w": 0.9,
     "h": 1.0,
     "sill": 7.9,
@@ -884,7 +884,7 @@
    {
     "part": "wheelhouse",
     "face": "n",
-    "centre": -0.9,
+    "centre": -0.72,
     "w": 0.9,
     "h": 1.0,
     "sill": 7.9,
@@ -893,7 +893,7 @@
    {
     "part": "wheelhouse",
     "face": "n",
-    "centre": 0.9,
+    "centre": 0.72,
     "w": 0.9,
     "h": 1.0,
     "sill": 7.9,
@@ -909,13 +909,13 @@
     "glass": false
    }
   ],
-  "notes": "ENTERABLE (the hold), UNCHANGED footprint/opening. The footprint [24,8] puts the hull's long axis along x, so the pointed ends are the e/w faces and the 24 m sides are s/n; the hexagon plan (sides 6, clipped to the box) gives a pointed bow at x -12 and stern at x +12 with flat sides at y +-4 between x +-9.7. ONE way in: a torn-open gash in the hull's s (landward) SIDE, centre x -3.0, 1.6 x 2.3 m, sill 0, no leaf. Hold = one open space 23 x 7 m under the deck (deck slab 4.6-4.9 m), interior floor_z 0.05, no stair. THRESHOLD CHECK: in the compiled geometry the hold slab is at 0.05 and the gash sill at 0 - a 0.05 m step, and the walk gate's threshold probe (0.05-0.8 m outside) passes. The reported 0.4 m step is therefore NOT in the spec: the engine grounds an enterable building at the CENTRE of its door face (footprint edge, centre 0) and this gash is 3 m off-centre along a face that lies on a rotated (rot 109.4) shoreline, so the beach under the gash sits ~0.4 m off the grounding sample. Fix at placement (level the shingle under x -3 of the s face, or nudge pos), not here - the gash centre is frozen by the furniture. Superstructure is SOLID (interior:false) and sealed: a full-beam metal deckhouse 5 x 8 m at x +7 with a 3.6 x 4.6 m wheelhouse on top (to 9.6 m), all their window openings now `glass:false` (a wreck has no glass left; also keeps the GLB under the 16-surface gate - 12 panes would have failed it), and all superstructure caps `none` (flat mass tops). Mast 0.9 x 0.9 m, 12 m tall, rooted in the solid bow point at x -11.4. Gunwale band at 4.1 m. Place with rot so the s face is landward. Weathered TIMBER hull, metal deckhouse/wheelhouse."
+  "notes": "ENTERABLE hold. Hexagonal hull 15.8 x 7 (shrunk from 24 m so the engine's cell-footprint cap does not scale it); gash on the s face centre -2.0, 1.6 x 2.3, no leaf."
  },
  {
   "id": "sea_caves",
   "footprint": [
-   22,
-   16
+   15.8,
+   11.3
   ],
   "floors": 1,
   "floor_height": 5.0,
@@ -930,12 +930,12 @@
    {
     "name": "mouth",
     "footprint": [
-     11,
-     9
+     9,
+     7
     ],
     "at": [
-     -5.5,
-     3.5
+     -2.0,
+     2.0
     ],
     "plan": {
      "shape": "polygon",
@@ -954,12 +954,12 @@
    {
     "name": "main",
     "footprint": [
-     14.5,
-     11
+     10.4,
+     8
     ],
     "at": [
-     3.75,
-     -0.5
+     2.7,
+     -0.4
     ],
     "plan": {
      "shape": "polygon",
@@ -978,12 +978,12 @@
    {
     "name": "back",
     "footprint": [
-     11,
-     8
+     8,
+     5.8
     ],
     "at": [
-     -5.5,
-     -4.0
+     -3.9,
+     -2.9
     ],
     "plan": {
      "shape": "polygon",
@@ -1005,15 +1005,15 @@
     "part": "mouth",
     "face": "s",
     "centre": 0,
-    "w": 2.2,
+    "w": 2.0,
     "kind": "arch",
     "springing": 1.5,
-    "radius": 1.1,
+    "radius": 1.0,
     "sill": 0,
     "leaf": false
    }
   ],
-  "notes": "UNCHANGED (passes every current gate: 5 surfaces, 1 body, 1 void, arch crown 2.6 m inside the door gate). ENTERABLE. Three battered polygonal chambers (clipped 8/10/8-gons - faceted rock rather than smooth ellipses, which also cuts the collision shell from ~8k to a few hundred triangles), one connected void: mouth chamber 11 x 9 m (5 m) at the front-left, main chamber 14.5 x 11 m (6.5 m) on the right, back chamber 11 x 8 m (4.5 m) behind the mouth. Interior voids (each inset 0.7 m) overlap along the centre lines -> throats several metres wide mouth->main and main->back; mouth and back do not touch directly (route is mouth -> main -> back). ONE way in: open arch (2.2 m wide, 1.5 m springing + 1.1 m radius = 2.6 m crown, no leaf) in the mouth chamber's s face, centre 0 (at x -5.5 on the structure's s edge; the clipped polygon has a flat face there). No windows, interior floor_z 0.05, no stairs. Caps are low gabled rock-ridges clipped to each polygon (solid, roof_height 1.6/2.2/1.4, alternating ridge axes) above flat 5/6.5/4.5 m ceilings - not the requested domes, because a tessellated dome or pyramid cap alone puts 1-1.5k triangles per chamber into the collision shell; the batter + facets carry the 'rock' read. Arch crown is 2.6 m (not the requested 2.7) so it stays inside the door gate without a gate:true flag."
+  "notes": "ENTERABLE. Three battered polygonal chambers at true scale (15.8 x 11.3, inside one cell): mouth 9x7 at [-2.0,2.0] overlapping main 10.4x8 at [2.7,-0.4] by 5 m so the voids join; back 8x5.8 at [-3.9,-2.9] joins main. One open arch on the mouth's s face (2.0 wide, crown 2.5) at x -2.0."
  },
  {
   "id": "house_a",
@@ -1381,7 +1381,7 @@
  {
   "id": "terrace",
   "footprint": [
-   21,
+   15.8,
    7
   ],
   "floors": 1,
@@ -1394,11 +1394,11 @@
    {
     "name": "c1",
     "footprint": [
-     7.2,
+     5.4,
      7
     ],
     "at": [
-     -6.9,
+     -5.2,
      0
     ],
     "profile": "vertical",
@@ -1422,7 +1422,7 @@
    {
     "name": "c2",
     "footprint": [
-     7.4,
+     5.6,
      7
     ],
     "at": [
@@ -1450,11 +1450,11 @@
    {
     "name": "c3",
     "footprint": [
-     7.2,
+     5.4,
      7
     ],
     "at": [
-     6.9,
+     5.2,
      0
     ],
     "profile": "vertical",
@@ -1482,7 +1482,7 @@
      0.9
     ],
     "at": [
-     -3.45,
+     -2.7,
      0
     ],
     "profile": "vertical",
@@ -1499,7 +1499,7 @@
      0.9
     ],
     "at": [
-     3.45,
+     2.7,
      0
     ],
     "profile": "vertical",
@@ -1514,7 +1514,7 @@
    {
     "part": "c1",
     "face": "s",
-    "centre": -1.9,
+    "centre": -1.4,
     "w": 1.0,
     "h": 2.05,
     "sill": 0,
@@ -1524,7 +1524,7 @@
    {
     "part": "c1",
     "face": "s",
-    "centre": 1.5,
+    "centre": 1.1,
     "w": 1.0,
     "h": 1.3,
     "sill": 0.9
@@ -1532,7 +1532,7 @@
    {
     "part": "c1",
     "face": "s",
-    "centre": -1.9,
+    "centre": -1.4,
     "w": 1.0,
     "h": 1.2,
     "sill": 3.7
@@ -1540,7 +1540,7 @@
    {
     "part": "c1",
     "face": "s",
-    "centre": 1.5,
+    "centre": 1.1,
     "w": 1.0,
     "h": 1.2,
     "sill": 3.7
@@ -1578,7 +1578,7 @@
    {
     "part": "c2",
     "face": "s",
-    "centre": -1.9,
+    "centre": -1.4,
     "w": 1.0,
     "h": 2.05,
     "sill": 0,
@@ -1588,7 +1588,7 @@
    {
     "part": "c2",
     "face": "s",
-    "centre": 1.5,
+    "centre": 1.1,
     "w": 1.0,
     "h": 1.3,
     "sill": 0.9
@@ -1596,7 +1596,7 @@
    {
     "part": "c2",
     "face": "s",
-    "centre": -1.9,
+    "centre": -1.4,
     "w": 1.0,
     "h": 1.2,
     "sill": 3.9
@@ -1604,7 +1604,7 @@
    {
     "part": "c2",
     "face": "s",
-    "centre": 1.5,
+    "centre": 1.1,
     "w": 1.0,
     "h": 1.2,
     "sill": 3.9
@@ -1632,7 +1632,7 @@
    {
     "part": "c3",
     "face": "s",
-    "centre": -1.9,
+    "centre": -1.4,
     "w": 1.0,
     "h": 2.05,
     "sill": 0,
@@ -1642,7 +1642,7 @@
    {
     "part": "c3",
     "face": "s",
-    "centre": 1.5,
+    "centre": 1.1,
     "w": 1.0,
     "h": 1.3,
     "sill": 0.9
@@ -1650,7 +1650,7 @@
    {
     "part": "c3",
     "face": "s",
-    "centre": -1.9,
+    "centre": -1.4,
     "w": 1.0,
     "h": 1.2,
     "sill": 3.7
@@ -1658,7 +1658,7 @@
    {
     "part": "c3",
     "face": "s",
-    "centre": 1.5,
+    "centre": 1.1,
     "w": 1.0,
     "h": 1.2,
     "sill": 3.7
@@ -2026,7 +2026,7 @@
   "id": "chapel",
   "footprint": [
    10.0,
-   26.9
+   15.9
   ],
   "floors": 1,
   "floor_height": 7.4,
@@ -2042,11 +2042,11 @@
     "name": "nave",
     "footprint": [
      10.0,
-     16.0
+     8.5
     ],
     "at": [
      0,
-     -0.15
+     -0.55
     ],
     "profile": "vertical",
     "height": 7.4,
@@ -2064,12 +2064,12 @@
    {
     "name": "tower",
     "footprint": [
-     5.0,
-     5.0
+     4.4,
+     4.4
     ],
     "at": [
      0,
-     9.15
+     4.9
     ],
     "profile": "vertical",
     "height": 14.5,
@@ -2087,11 +2087,11 @@
     "name": "porch",
     "footprint": [
      3.8,
-     3.0
+     2.6
     ],
     "at": [
      0,
-     11.95
+     6.65
     ],
     "profile": "vertical",
     "height": 3.6,
@@ -2109,12 +2109,12 @@
    {
     "name": "chancel",
     "footprint": [
-     7.0,
-     6.5
+     6.5,
+     4.3
     ],
     "at": [
      0,
-     -10.2
+     -5.8
     ],
     "profile": "vertical",
     "height": 5.4,
@@ -2144,7 +2144,7 @@
    {
     "part": "nave",
     "face": "e",
-    "centre": -5.0,
+    "centre": -2.6,
     "w": 1.0,
     "kind": "arch",
     "springing": 2.9,
@@ -2164,7 +2164,7 @@
    {
     "part": "nave",
     "face": "e",
-    "centre": 5.0,
+    "centre": 2.6,
     "w": 1.0,
     "kind": "arch",
     "springing": 2.9,
@@ -2174,7 +2174,7 @@
    {
     "part": "nave",
     "face": "w",
-    "centre": -5.0,
+    "centre": -2.6,
     "w": 1.0,
     "kind": "arch",
     "springing": 2.9,
@@ -2194,7 +2194,7 @@
    {
     "part": "nave",
     "face": "w",
-    "centre": 5.0,
+    "centre": 2.6,
     "w": 1.0,
     "kind": "arch",
     "springing": 2.9,
@@ -2267,7 +2267,7 @@
     "glass": false
    }
   ],
-  "notes": "ENTERABLE landmark, P0 REDESIGN as ONE four-part composition (replaces the old single box + separate bell_tower). Footprint = TRUE mass bounding box [10.0, 26.9] (w along x, d along y), composition centred on it; the 0.12 m plinth projects that much beyond on every side (Mason warns 'past the declared footprint' by 0.24 - expected). Axis runs along y with the ENTRANCE at the s (front) end. Parts, front to back (s=+y in Mason's frame): WEST PORCH 3.8 x 3.0 m, 3.6 m eaves, slate gable ridge along y, its front face ON the footprint's s edge (y = +13.45); WEST TOWER 5.0 x 5.0 m on the axis, 14.5 m to the parapet under a slate spire (tip ~22.3 m), belfry arches at sill 11.3 on all four faces (unglazed, open) and a west lancet at sill 5.6 above the porch roof; NAVE 10.0 x 16.0 m, 7.4 m eaves, slate gable ridge along y (ridge 11.0 m), three tall arched lancets per side (springing 4.8 m, crown 5.3 m, sill 2.2 m, glazed); CHANCEL 7.0 x 6.5 m, 5.4 m eaves, lower and narrower gable, one big glazed east window on its n face. Every junction overlaps by 1.2 m (>= 2 x wall_t 0.5) so Mason counts ONE body and ONE connected void: porch -> tower vestibule -> nave -> chancel. THE ONLY WAY IN: arched porch door, s face, centre 0 (dead on the footprint's centre line), 1.5 m wide, springing 1.6 + radius 0.75 = 2.35 m crown, sill 0, timber arch-headed leaf hung by Mason. Interior floor_z 0.2 everywhere, floors 1, NO stairs. Rooms: porch 2.8 x 2.0 m; tower vestibule 4.0 x 4.0 m open to the belfry (a 14.5 m shaft - look up and see sky through the belfry arches); nave 9.0 x 15.0 m, flat ceiling at 7.4 m, one open floor for pews (leave the axis clear from the tower arch at the s end to the chancel arch at the n end); chancel 6.0 x 5.5 m, ceiling 5.4 m, entered through a 6.0 m wide opening in the nave's n wall (altar against the chancel n wall under the east window). Design decisions: (1) plinth top_z is exactly floor_z (0.2) - on a multi-part building each part's plinth ring runs THROUGH the neighbouring void and is not carved by it, so a taller plinth leaves a stone kerb across every internal doorway (0.6 m on the old design = the 'sealed itself' bug); flush with the slabs it is invisible inside. No string courses for the same reason and for the surface budget. (2) tower height 14.5 puts the belfry sills (11.3) above the nave ridge (11.0) so the n belfry cutter cannot notch the nave roof. (3) 7 glazed panes + 1 leaf + body/roof/trim + shell (body, 3 roof solids, plinth) = 16 surfaces, the walk gate's ceiling; tower openings are therefore unglazed (correct for a belfry)."
+  "notes": "ENTERABLE landmark, four-part composition (porch -> tower base -> nave -> chancel), SHRUNK to 15.9 m so it fits inside one 16 m cell (the engine scales any placed model whose horizontal footprint exceeds the cell down to the cell size, which at 26.9 m made a 59 % doll's chapel with a 1.25 m door). Porch arched door on s, centre 0, 1.5 m wide, crown 2.35."
  },
  {
   "id": "chandlery",
