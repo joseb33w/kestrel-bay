@@ -89,6 +89,12 @@ const LIVE_ENEMY_BUDGET := 6            # HARD ring-wide ceiling on SIMULTANEOUS
                                         # many cells; on foot (9 resident cells) that's up to 45 high-poly skinned characters drawn+skinned
                                         # every frame on the mobile GPU (no runtime LOD) = the "lag around heavy assets". Nearest/forward cells
                                         # fill the budget first (forward-bias); the rest stay far static proxies. Evicting a cell frees its slots.
+const BOSS_RESERVE := 2                 # live boss slots held OUTSIDE LIVE_ENEMY_BUDGET. Two, not one: a
+                                        # world may legitimately have two set-piece foes resident at once
+                                        # (a camp leader and a beast), and a boss the player walked to must
+                                        # never be the body the crowd ceiling happened to drop.
+var _boss_live := 0                     # bosses currently resident; decremented on evict with their cell
+
 const MAX_ENEMIES_PER_CELL := 3         # cap live per-cell enemies (5->3: fewer high-poly SKINNED Meshy draws on the mobile GPU near a camp; the ring-wide LIVE_ENEMY_BUDGET is the hard ceiling). Each = a skinned GLB + a per-frame
                                         # NavigationAgent/RVO tick); a camp authoring 40 tanks the framerate
                                         # when they cluster near the player. 9 resident cells * 8 is the ceiling.
@@ -158,6 +164,23 @@ var _warming := false                  # a background flight asset-warm coroutin
 # for every placed resident structure; cleared on _evict. nudge_out() pushes a spawn (player/vehicle)
 # out of any structure it lands inside, so a world authoring a spawn on top of a building can't strand.
 var _struct_foots := {}
+
+## THE FLOOR REGISTRY — because "the ground" and "the surface you are standing on" are not the
+## same question, and every placement path here was answering the first one.
+##
+## Everything a cell places — furniture, NPCs, chests, door leaves — was grounded with _ground_y(),
+## the raw heightmap. Inside a building that is simply the wrong surface: the interior floor is a
+## FLAT slab at `base_y + floor_z`, the terrain under it is not flat, and the two diverge across
+## the room. Measured on one coastal build: every authored NPC a metre under the floor it was
+## standing on, chests under the deck they were sitting on, and furniture that rose and sank with
+## the hillside while the floor it was meant to rest on stayed level. Authors compensated by hand
+## with a `pos: [x, y, z]` lift, which cannot work — one number cannot cancel a slope.
+##
+## So a building REGISTERS the floor it builds, and _surface_y answers with it. cell_key -> Array of
+## {c:Vector2 centre-xz, e:Vector2 half-extents, yaw:float, y:float floor-top, top:float roof-top}.
+## Rotation-aware (the test rotates the query into the plate's own frame), cleared on _evict with
+## everything else that cell owns.
+var _floor_plates := {}
 
 # --- far-proxy ring state (silhouettes past the resident ring; see FAR RING in the header) ---
 var _proxies := {}                     # cell_key -> Node3D proxy root (ground+structures+roads, NO colliders)
@@ -375,6 +398,11 @@ func _gather_life_urls(rec: Dictionary, urls: Array) -> void:
 		var nu := _npc_model_url(npc)
 		if nu != "" and not urls.has(nu):
 			urls.append(nu)
+		var hh := String(npc.get("holds", ""))
+		if hh != "":
+			var hu := _resolve(hh)          # what the NPC carries is an asset like any other
+			if not urls.has(hu):
+				urls.append(hu)
 
 
 # ---------------- live hot-reload (B2) ----------------
@@ -636,9 +664,14 @@ func _evict(k: String) -> void:
 	var cell_enemies: Array = rec.get("enemies", [])
 	for e in cell_enemies:
 		enemies.erase(e)
+		# hand the reserved slot back, or a player who roams past three camps can never meet a
+		# fourth boss (the counter would only ever climb)
+		if is_instance_valid(e) and (e as Node).has_meta("boss_id"):
+			_boss_live = maxi(0, _boss_live - 1)
 	if interaction != null:
 		interaction.remove_cell(k)   # drop this cell's npc/chest/door entries -> no ghost interactables
 	_struct_foots.erase(k)          # drop this cell's structure footprints (spawn-clearance registry)
+	_floor_plates.erase(k)          # ... and its interior floor plates (see THE FLOOR REGISTRY)
 
 
 # ---------------- far-proxy ring (silhouette cells past the resident ring) ----------------
@@ -1043,6 +1076,17 @@ func build_cell(rec: Dictionary, gx: int, gz: int) -> Dictionary:
 		var nu := _npc_model_url(rec.get("npc"))
 		if nu != "" and not urls.has(nu):
 			urls.append(nu)
+		var hh2 := String((rec.get("npc") as Dictionary).get("holds", ""))
+		if hh2 != "":
+			var hu2 := _resolve(hh2)
+			if not urls.has(hu2):
+				urls.append(hu2)
+	if typeof(rec.get("boss", null)) == TYPE_DICTIONARY:
+		var bm := String((rec.get("boss") as Dictionary).get("model", ""))
+		if bm != "":
+			var bu := _resolve(bm)
+			if not urls.has(bu):
+				urls.append(bu)
 	var root := Node3D.new()
 	world_main.add_child(root)
 
@@ -1168,12 +1212,34 @@ func build_cell(rec: Dictionary, gx: int, gz: int) -> Dictionary:
 	if landmark != null:
 		_place_one(root, landmark, centre, half, ckey)
 	if prop_list is Array:
+		# BUILDINGS FIRST, DRESSING SECOND — always, regardless of the order the world authored them.
+		# A building publishes the floor plate that everything inside it resolves against, so a chair
+		# listed before its pub used to be grounded on the hillside and the pub floor arrived after.
+		# That made correctness depend on array order, which no author can be expected to maintain
+		# and no gate was checking. Two passes make it structural instead. Buildings also take the
+		# PROP_CAP budget first, which is the right priority when a cell is over its cap anyway.
 		var placed := 0
-		for p in prop_list:
-			if placed >= PROP_CAP:
-				break
-			if _place_one(root, p, centre, half, ckey):
-				placed += 1
+		var dropped := 0
+		for pass_buildings in [true, false]:
+			for p in prop_list:
+				# Pass filter FIRST: an entry belonging to the other pass is not a drop, and
+				# counting it as one would report every prop twice over.
+				var is_b: bool = typeof(p) == TYPE_DICTIONARY and (p as Dictionary).has("footprint")
+				if is_b != pass_buildings:
+					continue
+				if placed >= PROP_CAP:
+					dropped += 1
+					continue
+				if _place_one(root, p, centre, half, ckey):
+					placed += 1
+		# SAY WHAT WAS DROPPED. The cap was raised 12 -> 20 precisely because interiors made cells
+		# carry a building's furniture as well as its street dressing — and the drop itself stayed
+		# silent, so the surplus simply never appeared. An author sees a half-dressed room and no
+		# reason for it, which is the same defect GOGI_PLACE_CLAMPED was written to end.
+		if dropped > 0:
+			print("GOGI_PROP_CAP_DROPPED ", ckey, " ", dropped, " of ", prop_list.size(),
+				" (cap ", PROP_CAP, ") — this cell authored more props than one cell can hold; ",
+				"move some to a neighbouring cell or drop them from the spec")
 	if scatter_list is Array:
 		for s in scatter_list:
 			_place_scatter(root, s, centre, half)
@@ -1190,23 +1256,43 @@ func build_cell(rec: Dictionary, gx: int, gz: int) -> Dictionary:
 		if typeof(npc) == TYPE_DICTIONARY:
 			var np := _xz(npc.get("pos", [0, 0]))
 			var npos := centre + Vector3(clampf(np.x, -half + 1.0, half - 1.0), 0.0, clampf(np.y, -half + 1.0, half - 1.0))
-			npos.y = _ground_y(npos.x, npos.z)
+			# THE SURFACE, not the terrain — a harbour master authored inside his office stands on the
+			# office FLOOR. `pos: [x, y, z]` now lifts/storeys him exactly as it does a prop; the
+			# 2-element form is unchanged, so every existing outdoor NPC lands where it always did.
+			npos.y = _surface_y(npos.x, npos.z, _elev(npc.get("pos", [0, 0])))
 			var nmu := _npc_model_url(npc)
 			var nmodel: Node = null
 			if builder.cache.has(nmu):
 				nmodel = (builder.cache[nmu] as Node).duplicate()
-				_no_shadows(nmodel)   # skinned NPCs don't cast shadows (perf)
+				# AN AUTHORED NPC KEEPS ITS SHADOW. _no_shadows was applied to every skinned
+				# character alike, and it is right for the two cases it was written for — a
+				# `populate` crowd of dozens and a cluster of enemies in a fight, where the shadow
+				# pass re-skins every one of them per frame. An authored NPC is neither: there are
+				# a handful per world and they are the ones the player walks up to and talks to.
+				# With no contact shadow a character has nothing joining it to the floor, so it
+				# reads as pasted onto the scene however good the model is — which is half of why
+				# a perfectly clean Meshy character gets reported as "looking off". Crowds
+				# (_place_populate), enemies and bosses below keep the opt-out.
 			# `gender` / `age` drive VOICE CASTING (interaction.VOICE_BANDS) — without them an NPC
 			# keeps the old whole-palette hash, which is how a town's two women ended up speaking
 			# as its two deepest men.
+			# `holds` is an asset url like any other prop's, resolved from the same cache — so an
+			# NPC authored to haul a crate gets the crate, and _idle_animate gets to play the haul.
+			var hmodel: Node = null
+			var hraw := String(npc.get("holds", ""))
+			if hraw != "":
+				var hurl := _resolve(hraw)   # _resolve("") returns the bare origin, so test the RAW field
+				if builder.cache.has(hurl) and builder.cache[hurl] != null:
+					hmodel = (builder.cache[hurl] as Node).duplicate()
 			interaction.add_npc(npos, String(npc.get("id", "")), String(npc.get("name", "Stranger")),
 				String(npc.get("persona", "")), npc.get("lines", []), nmodel, root, ckey, String(npc.get("sound", "")),
-				String(npc.get("gender", "")), String(npc.get("age", "")))
+				String(npc.get("gender", "")), String(npc.get("age", "")),
+				String(npc.get("activity", "")), hmodel, bool(npc.get("seated", false)))
 		var chest = rec.get("chest", null)
 		if typeof(chest) == TYPE_DICTIONARY:
 			var cp := _xz(chest.get("pos", [0, 0]))
 			var cpos := centre + Vector3(clampf(cp.x, -half + 1.0, half - 1.0), 0.0, clampf(cp.y, -half + 1.0, half - 1.0))
-			cpos.y = _ground_y(cpos.x, cpos.z)
+			cpos.y = _surface_y(cpos.x, cpos.z, _elev(chest.get("pos", [0, 0])))   # on the deck, not under it
 			interaction.add_chest(cpos, chest.get("contents", []), int(chest.get("gold", 0)), root, ckey)
 		var door_list = rec.get("doors", [])
 		if door_list is Array:
@@ -1215,7 +1301,7 @@ func build_cell(rec: Dictionary, gx: int, gz: int) -> Dictionary:
 					continue
 				var dp := _xz(d.get("pos", [0, 0]))
 				var dpos := centre + Vector3(clampf(dp.x, -half + 1.0, half - 1.0), 0.0, clampf(dp.y, -half + 1.0, half - 1.0))
-				dpos.y = _ground_y(dpos.x, dpos.z)
+				dpos.y = _surface_y(dpos.x, dpos.z, _elev(d.get("pos", [0, 0])))
 				# w/h/material are the DOORWAY this leaf fills. Authoring them is how a cathedral
 				# gets a cathedral door and a cottage gets a cottage one; omitting them gives a
 				# human-sized timber door rather than the 2.2m slab the leaf used to be fixed at.
@@ -1227,16 +1313,58 @@ func build_cell(rec: Dictionary, gx: int, gz: int) -> Dictionary:
 	# spawn this cell's enemies at the world offset (ring around the cell centre)
 	var cell_enemies: Array = []
 	var emu := _enemy_model_url(rec)
+	# ---- THE BOSS GETS A RESERVED SLOT, AND STANDS WHERE IT WAS PUT ----------------------------
+	#
+	# A ringleader used to be nothing but an enemy with large numbers, so it competed for the same
+	# LIVE_ENEMY_BUDGET as its mooks and lost. Measured on one build: four adjacent camp cells
+	# authored 3+3+2+1 = 9 against a ring-wide ceiling of 6, and which of the nine you got depended
+	# on the direction you walked in from — approach from the wreck and you meet six smugglers and
+	# NO ringleader, approach from the caves and you meet the ringleader and no melee. The kill
+	# objective needed all of them, so the quest could only be finished by leaving and coming back.
+	# A boss is not one more body in the crowd budget: it is the point of the encounter, so it gets
+	# its own reserve and spawns FIRST.
+	#
+	# It also spawns where the author put it. Every other enemy is scattered around a ring at 45%
+	# of the cell for spacing, which is right for a patrol and wrong for a boss — it parked the
+	# ringleader outside the mouth of the cave he was supposed to be hiding in. `boss.pos` is
+	# cell-local like every other placement and defaults to the cell centre, and it grounds through
+	# _surface_y, so a boss in a cave stands on the cave floor.
+	var boss_spec = rec.get("boss", null)
+	if typeof(boss_spec) == TYPE_DICTIONARY and _boss_live < BOSS_RESERVE:
+		var bd: Dictionary = boss_spec
+		var bmu := _resolve(String(bd.get("model", ""))) if String(bd.get("model", "")) != "" else emu
+		if builder.cache.has(bmu) and builder.cache[bmu] != null:
+			var b := CharacterBody3D.new()
+			b.set_script(EnemyScript)
+			root.add_child(b)
+			var bxz := _xz(bd.get("pos", [0, 0]))
+			var bpos := centre + _xz3(_clamp_into_cell(bxz, half, "boss"))
+			bpos.y = _surface_y(bpos.x, bpos.z, _elev(bd.get("pos", [0, 0])))
+			b.global_position = bpos
+			var bmodel: Node = (builder.cache[bmu] as Node).duplicate()
+			_no_shadows(bmodel)
+			var bopts := {}
+			for bp in [["hp", "hp"], ["damage", "damage"], ["speed", "speed"], ["range", "range"],
+					["height", "height"], ["aquatic", "aquatic"], ["aerial", "aerial"], ["hover", "hover"]]:
+				if bd.has(bp[0]):
+					bopts[bp[1]] = bd[bp[0]]
+			b.setup(player, bmodel, world_main, 0, 1, String(bd.get("type", rec.get("enemy_type", "skeleton"))), bopts)
+			if b.has_method("set_meta"):
+				b.set_meta("boss_id", String(bd.get("id", "boss")))
+			cell_enemies.append(b)
+			_boss_live += 1
 	if enemy_n > 0 and builder.cache.has(emu):
 		for i in range(enemy_n):
-			if enemies.size() + cell_enemies.size() >= LIVE_ENEMY_BUDGET:
+			# Bosses are subtracted from the count: they hold their own BOSS_RESERVE, so they neither
+			# crowd out the mooks nor get crowded out by them.
+			if enemies.size() + cell_enemies.size() - _boss_live >= LIVE_ENEMY_BUDGET:
 				break   # ring-wide skinned-enemy ceiling hit -> the rest of this camp reads via static far proxies, not live skinned bodies
 			var e := CharacterBody3D.new()
 			e.set_script(EnemyScript)
 			root.add_child(e)
 			var ang := TAU * float(i) / float(enemy_n)
 			var epos := centre + Vector3(cos(ang) * (half * 0.45), 0.0, sin(ang) * (half * 0.45))
-			epos.y = _ground_y(epos.x, epos.z)   # spawn ON the terrain (not cell-centre y=0), same as every other placement path
+			epos.y = _surface_y(epos.x, epos.z)   # spawn ON the surface — the cave floor inside a cave, the terrain outside it
 			e.global_position = epos
 			var model: Node = (builder.cache[emu] as Node).duplicate()
 			_no_shadows(model)   # skinned enemies (incl. a boss) don't cast shadows — big clustered-combat win
@@ -1447,10 +1575,12 @@ func _road_strip(root: Node, centre: Vector3, dir: String, width: float, collide
 # so the first ground-level one (sill <= 0.4, matching mason.py's own _is_ground_opening) is the
 # threshold the building should be grounded at. "" when it has no way in — a solid monument, which
 # is legitimate, and which is then grounded at its centre like any other prop.
-func _way_in_face(rec: Dictionary) -> String:
+## The first opening a person can actually walk through — the whole record, not just its face, so
+## the plinth below can leave a gap where the doorway is.
+func _way_in_opening(rec: Dictionary) -> Dictionary:
 	var ops = rec.get("openings", [])
 	if typeof(ops) != TYPE_ARRAY:
-		return ""
+		return {}
 	for o in ops:
 		if typeof(o) != TYPE_DICTIONARY:
 			continue
@@ -1459,8 +1589,13 @@ func _way_in_face(rec: Dictionary) -> String:
 			continue
 		var f := String(od.get("face", "s")).to_lower()
 		if f in ["n", "s", "e", "w"]:
-			return f
-	return ""
+			return od
+	return {}
+
+
+func _way_in_face(rec: Dictionary) -> String:
+	var o := _way_in_opening(rec)
+	return String(o.get("face", "")).to_lower() if not o.is_empty() else ""
 
 
 func _has_interior(spec: Dictionary) -> bool:
@@ -1478,7 +1613,61 @@ func _has_interior(spec: Dictionary) -> bool:
 # World XZ of an enterable building's DOORWAY — the footprint-edge centre on the door face, honouring
 # the building's `rot` (yaw, degrees) and `scale`. Used to ground the base at the door-side terrain so
 # the threshold stays walkable on slopes. Mirrors build_structure._interior_spec's door_face default.
-func _door_world_xz(spec: Dictionary, p: Vector3) -> Vector2:
+## THE GROUND A PLAYER IS STANDING ON WHEN THEY TRY TO WALK IN — which is not the same place as
+## the ground under the wall, and the difference is a whole class of unenterable building.
+##
+## An enterable building is grounded at its DOORWAY so the threshold stays walkable, and `doorway`
+## meant the footprint-EDGE centre: the terrain directly beneath the wall line. That is fine on a
+## gentle slope and wrong on a real one, because nobody stands under the wall. They stand half a
+## metre to a metre and a half out, and on a steep site the ground has already fallen away by then.
+## Measured on a 9 x 20 m chapel on a cone hill: threshold flush with the terrain at the wall, and
+## a ~1 m climb from where you actually approach it — so the door opened, the arch was clear, every
+## compile-time gate passed (I re-ran the walk gate against the shipped GLB: clean), and the
+## building could be entered from neither side.
+##
+## So sample the wall line AND the approach, and ground to the LOWEST of them. The threshold is
+## then at most floor_z above the worst ground anyone can arrive on. The uphill side gets a taller
+## plinth, which is exactly what the plinth is for and what a real building on a hillside has.
+# A CharacterBody3D gets ~0.36 m of step for free and main._step_up_assist lifts onto a lip above
+# that — but only when it can find one. At a doorway the assist's probes are inside the reveal and
+# routinely find the arch or the jamb instead of the tread, so a threshold must not RELY on it.
+const THRESHOLD_STEP_MAX := 0.36
+const DOOR_APPROACH := [0.0, 0.6, 1.2, 1.8]   # metres outboard of the wall to sample
+
+
+## SAY WHEN A DOORWAY STILL IS NOT WALKABLE, with the numbers, from the place that knows all of
+## them. The compile-time gate can only see the building; this sees the building ON ITS SITE —
+## terrain, grounding, plinth and floor together — which is where the chapel's missing metre lived
+## and why nothing upstream could have caught it. verify.mjs fails the build on this line.
+func _report_threshold(rec: Dictionary, dspec: Dictionary, pos: Vector3, base_y: float) -> void:
+	var iv = rec.get("interior", null)
+	var fz := 0.0
+	if typeof(iv) == TYPE_DICTIONARY:
+		fz = float((iv as Dictionary).get("floor_z", 0.0)) * maxf(0.1, float(rec.get("scale", 1.0)))
+	var floor_w := base_y + fz
+	var worst := 0.0
+	for out_m in DOOR_APPROACH:
+		var d := _door_world_xz(dspec, pos, out_m)
+		var rise: float = floor_w - _ground_y(d.x, d.y)
+		if absf(rise) > absf(worst):
+			worst = rise
+	if absf(worst) > THRESHOLD_STEP_MAX:
+		var div = dspec.get("interior", {})
+		var dface := String((div as Dictionary).get("door_face", "?")) if typeof(div) == TYPE_DICTIONARY else "?"
+		print("GOGI_THRESHOLD_STEP ", String(rec.get("mason_type", rec.get("id", "building"))),
+			" %.2f" % worst, " face=", dface)
+func _door_ground_y(spec: Dictionary, p: Vector3) -> float:
+	var lo := INF
+	for out_m in DOOR_APPROACH:
+		var d := _door_world_xz(spec, p, out_m)
+		lo = minf(lo, _ground_y(d.x, d.y))
+	return lo if lo < INF else _ground_y(p.x, p.z)
+
+
+## `out_m` pushes the returned point that many metres OUTBOARD of the wall. Zero is the wall line
+## itself; the approach sampling below uses positive values, because that is where a player is
+## standing when they try to walk in.
+func _door_world_xz(spec: Dictionary, p: Vector3, out_m := 0.0) -> Vector2:
 	var iv = spec.get("interior", null)
 	var face := "s"
 	if typeof(iv) == TYPE_DICTIONARY:
@@ -1497,6 +1686,8 @@ func _door_world_xz(spec: Dictionary, p: Vector3) -> Vector2:
 		"w": local = Vector2(-foot.x * 0.5, 0.0)
 		_:   local = Vector2(0.0, -foot.y * 0.5)   # "s" (default, -Z face)
 	local *= sc
+	if out_m != 0.0 and local.length() > 0.0001:
+		local += local.normalized() * out_m
 	# rotate by the building yaw (Node3D.rotation.y about +Y: x' = x·c + z·s, z' = -x·s + z·c)
 	var rot := deg_to_rad(float(spec.get("rot", 0.0)))
 	var c := cos(rot)
@@ -1517,8 +1708,7 @@ func _place_structure(root: Node, spec: Dictionary, centre: Vector3, half: float
 	# read as "the door opens but I can't enter". Re-ground the base at the DOOR-SIDE terrain so the
 	# threshold is always a ~0.1 m step, enterable from any slope and any door orientation.
 	if _has_interior(spec):
-		var dxz := _door_world_xz(spec, p)
-		p.y = _ground_y(dxz.x, dxz.y)
+		p.y = _door_ground_y(spec, p)   # the APPROACH, not the wall line — see _door_ground_y
 	# ANTI-COINCIDENCE (Wave 3): lift a structure that lands (nearly) on top of one already placed in
 	# this cell so their coplanar faces don't z-fight. Normal spaced-out worlds never trigger this
 	# (bump stays 0); verify separately WARNs the author about the overlap.
@@ -1536,9 +1726,19 @@ func _place_structure(root: Node, spec: Dictionary, centre: Vector3, half: float
 	node.position = p
 	root.add_child(node)
 	# Fill the gap a sloped site leaves under the footprint (see _add_plinth).
+	var gface := ""
+	var giv = spec.get("interior", null)
+	if typeof(giv) == TYPE_DICTIONARY:
+		gface = String((giv as Dictionary).get("door_face", "s")).to_lower()
+		if not (gface in ["n", "s", "e", "w"]):
+			gface = ""
 	_add_plinth(node, _xz(spec.get("footprint", [8, 8])) * maxf(0.1, float(spec.get("scale", 1.0))),
 		deg_to_rad(float(spec.get("rot", 0.0))), node.position.y,
-		GSurf.surface(spec.get("material", "concrete")))
+		GSurf.surface(spec.get("material", "concrete")),
+		gface, 0.0, 1.4 if gface != "" else 0.0)   # GBuild centres a human doorway on the face
+	# Same floor plate the Mason path publishes — runtime-parametric buildings have interiors too,
+	# and dressing placed in one must resolve against its floor, not the hill under it.
+	_register_floor_plate(cell_key, spec, Vector2(p.x, p.z), node.position.y)
 	_register_structure_doors(node, cell_key)
 	var snd := String(spec.get("sound", ""))
 	# stream_for() checks the .pck FIRST and then the remote cache, so this resolves a template
@@ -1945,7 +2145,18 @@ var _clamp_logged := {}       # same, for out-of-cell positions
 const PLINTH_MIN := 0.12        # below this the ground is level enough that a skirt is just cost
 const PLINTH_MAX_DROP := 8.0    # a cliff is a placement mistake, not something to paper over
 
-func _add_plinth(node: Node3D, foot: Vector2, yaw: float, base_y: float, mat: Material) -> void:
+## `door_face` / `door_along` / `door_w` describe the way in, in the building's own local frame.
+## The plinth leaves a SLOT there instead of running through it.
+##
+## It used to be one box across the whole footprint, and because it hangs from the building's base
+## down to the lowest terrain under it, on a steep site that box is a metre of masonry standing
+## directly in front of the doorway. It carries no collider, so it never blocked anyone — it just
+## looked exactly like the thing that was blocking them, which is how a QA pass photographed "a
+## ~1 m stone block in front of the arch" and attributed the obstruction to it. Both halves are
+## worth fixing: the real obstruction is gone (see _door_ground_y) and so is the thing that looked
+## like it.
+func _add_plinth(node: Node3D, foot: Vector2, yaw: float, base_y: float, mat: Material,
+		door_face := "", door_along := 0.0, door_w := 0.0) -> void:
 	if foot.x <= 0.01 or foot.y <= 0.01:
 		return
 	var lo := INF
@@ -1960,16 +2171,37 @@ func _add_plinth(node: Node3D, foot: Vector2, yaw: float, base_y: float, mat: Ma
 		print("GOGI_PLINTH skipped: the ground falls %.1f m under this footprint — that is a cliff, "
 			% drop, "not a slope; move the building or flatten the spec")
 		return
-	var mi := MeshInstance3D.new()
-	var bm := BoxMesh.new()
-	bm.size = Vector3(foot.x + 0.08, drop, foot.y + 0.08)
-	mi.mesh = bm
-	if mat != null:
-		mi.material_override = mat
-	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	mi.name = "Plinth"
-	mi.position = Vector3(0.0, -drop * 0.5, 0.0)   # local: hangs below the building's own base
-	node.add_child(mi)
+	# The door slot, in the plinth's own (building-local) frame. n/s doorways vary along X, e/w
+	# along Z; 0.25 m of margin each side so the gap reads as a threshold rather than a seam.
+	var along_x := door_face == "n" or door_face == "s"
+	var span := foot.x + 0.08 if along_x else foot.y + 0.08
+	var gap_half := (door_w * 0.5 + 0.25) if door_w > 0.01 and door_face != "" else 0.0
+	var segs: Array = []   # [centre_along, length]
+	if gap_half <= 0.0 or gap_half * 2.0 >= span - 0.2:
+		segs.append([0.0, span])                       # no door, or a doorway as wide as the wall
+	else:
+		var lo_end := -span * 0.5
+		var hi_end := span * 0.5
+		var g0 := clampf(door_along - gap_half, lo_end, hi_end)
+		var g1 := clampf(door_along + gap_half, lo_end, hi_end)
+		if g0 - lo_end > 0.05:
+			segs.append([(lo_end + g0) * 0.5, g0 - lo_end])
+		if hi_end - g1 > 0.05:
+			segs.append([(g1 + hi_end) * 0.5, hi_end - g1])
+	for i in segs.size():
+		var c: float = segs[i][0]
+		var l: float = segs[i][1]
+		var mi := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(l, drop, foot.y + 0.08) if along_x else Vector3(foot.x + 0.08, drop, l)
+		mi.mesh = bm
+		if mat != null:
+			mi.material_override = mat
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mi.name = "Plinth" if segs.size() == 1 else "Plinth%d" % i
+		# local: hangs below the building's own base, offset along the door axis
+		mi.position = Vector3(c, -drop * 0.5, 0.0) if along_x else Vector3(0.0, -drop * 0.5, c)
+		node.add_child(mi)
 
 
 func _xz3(v: Vector2) -> Vector3:
@@ -2037,33 +2269,50 @@ func _place_one(root: Node, ref, centre: Vector3, half: float, cell_key := "", p
 	# GROUND: floor top is y=0; drop the model so its lowest point rests there (origins vary per .glb)
 	var ab := builder._world_aabb(n)
 	n.position.y -= maxf(0.0, ab.position.y)
-	# Then lift onto the terrain surface — and then onto the STOREY, if the record names one. The
-	# drop above still runs, so an elevated prop rests its base on the floor rather than hanging by
-	# whatever origin its .glb happened to be authored around.
-	# GROUND AN ENTERABLE BUILDING AT ITS DOOR, the way _place_structure does for the GBuild path.
-	# This lifted by the terrain under the CENTRE, so a Mason landmark — the path mason.md mandates
-	# for every compiled building — sat at its middle height while its threshold hung above or sank
-	# below the ground beside it. A GBuild structure with the same footprint on the same slope did
-	# not. Mason names its way in through `openings[]` rather than interior.door_face, so read it
-	# from there.
-	var gy := _ground_y(n.position.x, n.position.z)
-	if typeof(ref) == TYPE_DICTIONARY:
+	# Then lift onto the surface — and then onto the STOREY, if the record names one. The drop above
+	# still runs, so an elevated prop rests its base on the floor rather than hanging by whatever
+	# origin its .glb happened to be authored around.
+	#
+	# A BUILDING sits on the TERRAIN, grounded AT ITS DOOR the way _place_structure does for the
+	# GBuild path — this lifted by the terrain under the CENTRE, so a Mason landmark sat at its
+	# middle height while its threshold hung above or sank below the ground beside it. Mason names
+	# its way in through `openings[]` rather than interior.door_face, so read it from there.
+	#
+	# DRESSING sits on whatever SURFACE is actually under it, which inside a building is the flat
+	# interior floor and not the hillside beneath it. Conflating the two is what put furniture at
+	# the hill's height instead of the room's, sinking it at one end of a nave and floating it at
+	# the other. See _surface_y / THE FLOOR REGISTRY.
+	var is_building: bool = typeof(ref) == TYPE_DICTIONARY and (ref as Dictionary).has("footprint")
+	var way_in := {}
+	if is_building:
+		var gy := _ground_y(n.position.x, n.position.z)
 		var rd: Dictionary = ref
-		if rd.has("footprint") and _has_interior(rd):
-			var dface := _way_in_face(rd)
-			if dface != "":
-				var dspec := {"footprint": rd.get("footprint", [8, 8]), "rot": rd.get("rot", 0.0),
-					"scale": rd.get("scale", 1.0), "interior": {"door_face": dface}}
-				var dxz := _door_world_xz(dspec, n.position)
-				gy = _ground_y(dxz.x, dxz.y)
-	n.position.y += gy + _elev(ref.get("pos", [0, 0]))
+		way_in = _way_in_opening(rd)
+		if _has_interior(rd) and not way_in.is_empty():
+			var dface := String(way_in.get("face", "s")).to_lower()
+			var dspec := {"footprint": rd.get("footprint", [8, 8]), "rot": rd.get("rot", 0.0),
+				"scale": rd.get("scale", 1.0), "interior": {"door_face": dface}}
+			gy = _door_ground_y(dspec, n.position)   # the APPROACH, not the wall line
+			n.position.y += gy + _elev(ref.get("pos", [0, 0]))
+			_report_threshold(rd, dspec, n.position, n.position.y)
+		else:
+			n.position.y += gy + _elev(ref.get("pos", [0, 0]))
+	else:
+		n.position.y += _surface_y(n.position.x, n.position.z, _elev(ref.get("pos", [0, 0])))
 	# Same plinth for a COMPILED building. Only where the record declares a footprint — that is
 	# what marks it a building rather than a prop — and only on the resident ring, since a far
 	# proxy is a silhouette and the gap is not readable at that distance.
 	if physics and typeof(ref) == TYPE_DICTIONARY and (ref as Dictionary).has("footprint"):
 		var pfoot := _xz((ref as Dictionary).get("footprint", [8, 8])) * maxf(0.1, float(ref.get("scale", 1.0)))
+		var psc := maxf(0.1, float(ref.get("scale", 1.0)))
 		_add_plinth(n, pfoot, deg_to_rad(float(ref.get("rot", 0.0))), n.position.y,
-			GSurf.surface(String((ref as Dictionary).get("material", "stone"))))
+			GSurf.surface(String((ref as Dictionary).get("material", "stone"))),
+			String(way_in.get("face", "")).to_lower(),
+			float(way_in.get("centre", 0.0)) * psc, float(way_in.get("w", 0.0)) * psc)
+		# PUBLISH THE FLOOR. Everything placed inside this building after this point — furniture,
+		# an NPC, a chest, a door leaf — resolves its height against this plate instead of the
+		# terrain. Far proxies (physics false) carry no interior and register nothing.
+		_register_floor_plate(cell_key, ref as Dictionary, Vector2(n.position.x, n.position.z), n.position.y)
 	if maxf(ab.size.x, maxf(ab.size.y, ab.size.z)) >= BIG_ASSET_DIM:
 		_no_shadows(n)   # a huge landmark/creature's shadow pass is a main cause of "big monster" lag
 	# SOLID-BY-DEFAULT (shared SOLID_MIN_DIM contract): props + landmarks big enough to read as an
@@ -2357,7 +2606,10 @@ const MASON_COLLISION_NODE := "__collision"
 # door_<gsurf preset> for exactly the same reason the body is body_<preset>, and GSurf "timber"
 # carries real planked albedo and relief now. Leave it out and every leaf ships in mason.py's flat
 # preview colour — the untextured-monochrome failure this pass exists to prevent.
-const MASON_MAT_PREFIXES := ["body_", "roof_", "trim_", "door_"]
+# `glass_` joins the list so a window pane gets the real transparent material. Without it the
+# pane falls through _mason_materials untouched and renders as the GLB's flat preview colour —
+# an opaque pale slab in every window, which is worse than the hole it replaced.
+const MASON_MAT_PREFIXES := ["body_", "roof_", "trim_", "door_", "glass_"]
 const MASON_DOOR_PREFIX := "door_"
 
 ## `material_override` IS A MANDATE HERE, AND THAT IS DELIBERATE — but it only became defensible
@@ -2390,6 +2642,22 @@ static func _mason_materials(node: Node) -> void:
 			while mat.length() > 1 and mat[mat.length() - 1] >= "0" and mat[mat.length() - 1] <= "9":
 				mat = mat.substr(0, mat.length() - 1)
 			if GSurf.SURFACES.has(mat):
+				(nn as MeshInstance3D).material_override = GSurf.surface(mat)
+			else:
+				# SAY SO — this was the one place a wrong material name was completely silent.
+				# GSurf._note_unknown only fires from GSurf.surface(), and the guard above meant a
+				# Mason building whose material is not a preset never called it: no material was
+				# applied, no warning printed, and verify's UNKNOWN SURFACE PRESET gate could not
+				# fail it. The building ships as an untextured grey box. Mason takes `material` as
+				# a free string with no vocabulary of its own, so this is exactly where a typo or
+				# an invented name ("adobe", "corrugated") is most likely to land.
+				#
+				# It still surfaces the mesh rather than leaving it bare: GSurf.surface() on an
+				# unknown name resolves to the neutral default, which is a real triplanar material
+				# with relief — visibly better than the GLB's flat preview colour, and it makes the
+				# result identical to every other unresolved-preset path instead of a special case.
+				# surface() is what fires GOGI_SURFACE_UNKNOWN (once per distinct name), and it
+				# is cached, so this is one call doing both jobs.
 				(nn as MeshInstance3D).material_override = GSurf.surface(mat)
 			break
 
@@ -3028,6 +3296,79 @@ func _skyline_mat() -> StandardMaterial3D:
 # the terrain mesh, so a prop and the ground beneath it always agree.
 func _ground_y(wx: float, wz: float) -> float:
 	return terrain.height(wx, wz) if terrain != null else 0.0
+
+
+## Record the floor a building just built, so everything placed inside it can find it.
+## See THE FLOOR REGISTRY. `base_y` is the building's grounded origin; the spec supplies the rest.
+func _register_floor_plate(cell_key: String, spec: Dictionary, world_xz: Vector2, base_y: float) -> void:
+	if cell_key == "" or not _has_interior(spec):
+		return
+	var foot := _xz(spec.get("footprint", [0, 0])) * maxf(0.1, float(spec.get("scale", 1.0)))
+	if foot.x <= 0.01 or foot.y <= 0.01:
+		return
+	var iv = spec.get("interior", null)
+	var floor_z := 0.0
+	if typeof(iv) == TYPE_DICTIONARY:
+		floor_z = float((iv as Dictionary).get("floor_z", 0.0))
+	var arr: Array = _floor_plates.get(cell_key, [])
+	arr.append({
+		"c": world_xz,
+		"e": foot * 0.5,
+		"yaw": deg_to_rad(float(spec.get("rot", 0.0))),
+		"y": base_y + floor_z,
+		"fh": maxf(0.5, float(spec.get("floor_height", 3.2))),
+		"floors": maxi(1, int(spec.get("floors", 1))),
+	})
+	_floor_plates[cell_key] = arr
+
+
+## THE SURFACE UNDER A POINT — the interior floor when the point is inside a building, the terrain
+## when it is not. Returns the absolute y a thing's BASE should sit at, `lift` included.
+##
+## `lift` is the author's `pos: [x, y, z]` height. Outside a building it means what it always meant:
+## metres above the ground. INSIDE one it is snapped to a real STOREY, because that is what the
+## number was always trying to say — "3.4" on a building with 3.4 m floors means the first floor,
+## not 3.4 m of air, and snapping makes upstairs furniture land exactly instead of approximately.
+## A lift of 0 is storey 0, so every existing outdoor placement is byte-identical.
+func _surface_y(wx: float, wz: float, lift := 0.0) -> float:
+	var here := Vector2(wx, wz)
+	var best := {}
+	for arr in _floor_plates.values():
+		for pl in arr:
+			# rotate the query into the plate's own frame so a turned building still tests as a box
+			var d: Vector2 = (here - (pl["c"] as Vector2)).rotated(-float(pl["yaw"]))
+			var e: Vector2 = pl["e"]
+			if absf(d.x) > e.x or absf(d.y) > e.y:
+				continue
+			# overlapping buildings: the HIGHEST floor containing the point wins, which is the one
+			# whose room you are standing in when one is dug in behind another.
+			if best.is_empty() or float(pl["y"]) > float(best["y"]):
+				best = pl
+	if best.is_empty():
+		return _ground_y(wx, wz) + lift
+	# SNAP TO THE STOREY, THEN KEEP THE REMAINDER.
+	#
+	# Snapping alone was wrong in a way that only shows up on the second thing you place: it
+	# quantised EVERY indoor lift to a whole storey, so "0.75" — a tabletop — rounded to storey 0
+	# and the candlestick resolved to the floor. Nothing on top of anything else was placeable
+	# indoors. The snap is still right for what it was for (an author writing 3.4 on a building
+	# with 3.4 m floors means the first floor, exactly, not 3.4 m of air), so keep it and add back
+	# what it threw away: the part of the lift that is not a storey is a real height above that
+	# storey's floor. A bare 0 is still storey 0 with no residual, so ground-floor placement and
+	# every existing outdoor prop are untouched.
+	var fh := float(best["fh"])
+	var top := int(best["floors"]) - 1
+	var want := int(floor(lift / fh + 0.5))
+	var storey := clampi(want, 0, top)
+	# The residual only means something when the requested storey EXISTS. A lift above the top
+	# floor is an author asking for a storey the building does not have — landing on the top floor
+	# is the honest answer, and carrying the leftover would put the object that far through the
+	# roof. Rounding also makes the residual at most half a storey, which is the range that reads
+	# as "on top of the furniture" rather than "in the air".
+	var residual := (lift - float(storey) * fh) if want == storey else 0.0
+	# Only a POSITIVE residual is honoured. A negative one means the lift sat just under a storey
+	# line and rounded up; dropping the object below the floor it was snapped to would bury it.
+	return float(best["y"]) + float(storey) * fh + maxf(0.0, residual)
 
 
 func _cheb(a: Vector2i, b: Vector2i) -> int:

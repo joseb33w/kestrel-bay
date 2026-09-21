@@ -222,6 +222,43 @@ func update(delta: float, motion: Dictionary) -> void:
 	_match_rate(want, spd)
 
 
+## How long the clip a semantic kind resolves to actually runs, in seconds. 0.0 = this rig has no
+## such clip. THE CLIP IS THE ONLY THING THAT KNOWS HOW LONG A SWING TAKES, and every caller that
+## guessed instead got it wrong — see strike().
+func clip_length(kind: String) -> float:
+	if ap == null or not is_instance_valid(ap):
+		return 0.0
+	var c := resolve(kind)
+	if c == "":
+		return 0.0
+	var a := ap.get_animation(c)
+	return a.length if a != null else 0.0
+
+
+## SWING, AND SAY HOW LONG IT TAKES. Returns the clip's real length, or 0.0 when the rig has no
+## attack clip at all — which the caller must handle rather than paper over.
+##
+## The melee attack used to be two hardcoded numbers that agreed with each other and with nothing
+## else: a 0.45 s hold on the body clip and a 0.22 s procedural arc on the weapon. No rig has a
+## 0.45 s chop. A real one runs 1.0-1.5 s, so `update()` reclaimed the body a third of the way in
+## and cross-faded back to idle mid-blow — the player sees the swing START and never land, which
+## is exactly the "it only swings halfway" report. And on a rig with NO attack clip, play("attack")
+## fell through play()'s idle fallback: the body stood there breathing while the weapon flicked on
+## its own timer, which is the other half of the same report — "the weapon just moves, there's no
+## actual movement from the character".
+##
+## Returning 0.0 rather than silently substituting idle is the point. A missing attack clip is a
+## rig defect; the gate that catches it needs to be told, not smoothed over.
+func strike(kind := "attack") -> float:
+	var len_s := clip_length(kind)
+	if len_s <= 0.0:
+		return 0.0
+	attack_t = len_s
+	anim = ""          # force a restart: a re-tap must replay the swing, not no-op on kind == anim
+	play(kind)
+	return len_s
+
+
 ## Play a one-shot ACTION / emote clip (dance, wave, cheer, sit, taunt, …) then auto-return
 ## to locomotion after `hold` seconds. `clip` is any clip NAME on the rig OR a semantic key
 ## resolve() understands. This is the hook that lets the game give the character ALL types of

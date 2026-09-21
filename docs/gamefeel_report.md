@@ -1,139 +1,133 @@
-# KESTREL BAY — Game-Feel / Mobile-UX review
+# KESTREL BAY — Game-Feel / Mobile-UX review (FIX build re-test)
 
-**VERDICT: FAIL (0 P0, 6 P1)** — touch controls and the vehicle chase-cam are sound, but the phone player's
-first minute is broken by UI/camera defects: the opening story text is never shown (clobbered by a raw region-id
-toast), the default camera at spawn and around the harbour office is walled by a building slab / a net-pile prop,
-the stats block is illegible over the pale stone the whole quay is made of, and the quest text renders at ~9 CSS px.
-None of these is a ship-blocker class (touch is live, no full-frame mesh on every hit), all are must-fix before PR.
+**VERDICT: FAIL (0 P0, 6 P1)** — the data-level fixes landed and work (display-name region toasts, story
+subtitle survives, spawn no longer walled, SMUGGLERS DOWN gated to the cove, inventory line clean, driver in the cab).
+Touch is fully live, damage is non-modal, the chase cam is right. What still blocks a phone PR is ENGINE-level
+camera/HUD behaviour that the re-synced template did **not** fix — and two of them are worse than the last report
+measured: the camera inside every 3 m room collapses to a hero-filling frame at NEUTRAL pitch (not only on pitch-down),
+and the story subtitle (the slot the last report told you to move story text INTO) is laid out over the JUMP/SHEATHE/USE
+thumb buttons in both orientations.
 
-Evidence: every claim below was driven on the LIVE export (`…/cloud-cbnqgdi78kdlrr3elmbb/play` — byte-identical to
-`/workspace/out/index.html` + `world.json`) in headless Chromium/SwiftShader with a touch-emulating mobile context
-(CDP `Input.dispatchTouchEvent`), at **390×844 portrait** and **860×400 landscape**. Screenshots:
-`/mnt/session/outputs/gamefeel/*.png` (also `/tmp/gf/shots/`). Frame rate in this GPU-less container was 1–4 fps,
-so I judged framing/layout/controls only, never colour/exposure/smoothness.
+Evidence: every claim was driven on `/workspace/repo/out` served locally (wasm MIME, `/godot-assets/` proxied to
+preview.myapping.com) in headless Chromium/SwiftShader with a touch-emulating mobile context (CDP
+`Input.dispatchTouchEvent` — the real touch path, not mouse), at **390×844 portrait** and **860×400 landscape**.
+Screenshots: `/workspace/verify/gf/*.png` (harness: `/tmp/gf/*.mjs`, logs `/tmp/gf/*.log`). Container ran at
+**1–5 fps**; cell/GLB streaming is frame-budgeted so a cell took 20–130 s to appear here (it is sub-second on a phone) —
+I waited 130 s before judging anything. For far places (pub, cove, slope foot, boat) I served a **test copy of
+world.json with only `quay_spawn` changed** (and, for one slope run, `vehicles[0].pos`); the project was not touched.
+I judged framing/layout/controls only — never colour, exposure or smoothness.
+
+---
+
+## Re-test of the previous report (docs/gamefeel_report.md)
+
+| Prev | Status | Evidence |
+|---|---|---|
+| P1-1 story toasts clobbered by region toast | ✅ **fixed for the story line** (subtitle slot, 7 s, survives "The Harbour") / ⚠️ residual: the chain toast "Find the Harbour Master…" is still wiped by "The Harbour" at ~1.5 s of its 5 s hold | `p-begin+0.7s.png` (chain toast) → `p-begin+2.5s.png` ("The Harbour" replaced it; subtitle still up) → `p-begin+8.5s.png` (subtitle still up) |
+| P1-2 raw region ids | ✅ **fixed** — "The Harbour", "The Kestrel Arms" rendered; all 8 `regions[].name` are display strings; `r_light`/`r_cove`/`r_cove_spawn`/`r_cove_path` targets match (r_cove + r_cove_spawn fired live at the cove) | `p-begin+2.5s.png`, `toast-cross+0.3s.png`, `/tmp/gf/cove.log` |
+| P1-3 camera walled at spawn | ✅ **fixed** — 4 yaws + 2 pitch extremes at (39.5,36): no slab, no prop in the lens, shed_a ≥4 m clear of the arm | `p-spawn-yaw0/90/180/270.png`, `l-spawn-yaw0/90/180/270.png`, `p-spawn-pitch-*.png` |
+| P1-4 stats illegible | ❗ **still open (engine)** — `stats` Label still has no shadow/outline; invisible over sky/shingle | `zoom-p-stats-on-sky.png`, `boat-before-board.png`, `l-spawn-yaw0.png` |
+| P1-5 quest font 17 → ~9 CSS px | ❗ **still open (engine)**; data half done (descs shortened to one line each) but both open objectives still print | `p-spawn-yaw0.png` top-left |
+| P1-6 interior pitch-down = full-frame hero | ❗ **still open and broader** — see P1-1 below: it is the NEUTRAL pitch now, plus a floor clip on pitch-up | `office-inside-*.png`, `pub2-inside-*.png` |
+| P2-1 SMUGGLERS DOWN placement/gating | ✅ bottom_left, hidden at start, shown at the cove, clear of buttons / ⚠️ residual: still drawn ABOVE the title overlay before `start` fires | `cove-arrive.png` (shown), `p-spawn-yaw0.png` (hidden), `l-title.png` + `l-begin+0.8s.png` (on title) |
+| P2-2 inventory line | ✅ "Inv: [Boat Hook]", no WEAPON> cycle button | `p-spawn-yaw0.png` |
+| P2-3 spawn faces office back wall | ✅ changed — default view is quay + truck; office is off-axis | `p-spawn-yaw0.png` |
+| P2-4 driver torso through cab roof | ✅ driver now seated inside the cab (visible through the rear window) | `zoom-truck-driver.png` |
 
 ---
 
 ## Findings, most severe first
 
-### ❗ P1-1 — The opening story toasts are never seen; the player gets `harbour` instead (first-run + transient UI)
-**Symptom.** Tap BEGIN → the only toast that appears is the word **`harbour`** (raw region id, lower-case) for ~2 s
-(`p2-start-a.png`, `land-start-a.png`), then nothing (`p2-toastband-c.png`, `p2-start-d.png`). The chain toast
-"Find the Harbour Master - his office is on the quay" and the `r_start` toast "Rain again. The blue truck is on the
-quay; the road up climbs behind the net shed." are never visible in any of 4 captures spanning 0.4 s → 13 s.
-**Root cause (engine, but data-fixable).** `game_shell.gd` has ONE toast slot (`_toast()` overwrites text + timer).
-`_apply_mode()` toasts the chain line, then `fire("start")` → `r_start` toast replaces it immediately; ≤0.6 s later
-`_update_region()` fires `enter_region harbour` and calls `_toast(best, 2.2)` — the region NAME wipes the story
-toast. The same ordering (`fire("enter_region")` → then `_toast(name)`) means **`r_light`'s toast on entering
-`headland` ("Kestrel Point. The lighthouse stairs go all the way up.") is also overwritten by the word `headland`
-in the same frame** — verified by code read, same mechanism.
-**Fix (world.json, data-level).**
-1. `r_start.then[0]` → `{"subtitle": {"text": "Rain again. The blue truck is on the quay; the road up climbs behind the net shed.", "hold": 6}}` — the subtitle label (`_sub_lbl`, bottom third) is an independent slot the region toast cannot clobber. Same for `r_light` (→ `subtitle`). `r_cove` already uses `subtitle` and is fine.
-2. Optionally drop the chain `toast` on `settle_in` (redundant with the persistent quest label) so the region toast has nothing to fight.
-Engine note for the template owners: `_toast` should queue, or a region-name toast should not pre-empt a
-longer-hold authored toast.
+### ❗ P1-1 — Inside every 3 m room the camera collapses onto the hero at NEUTRAL pitch; behind-view is a floor smear; pitch-up clips under the floor (engine)
+**Symptom (harbour office 9×7×3.0 m and pub 14×10×3.2 m, both orientations).**
+- Neutral pitch, one step inside: hero fills **65–80 % of frame height**, wall/slab in front, no room readable
+  (`office-inside-neutral.png`, `office-inside-yaw+90.png`, `pub2-inside-neutral.png`).
+- Yaw the camera to look back at the door (a normal "where's the exit" move): the arm collapses below 1.35 m, the hero
+  is hidden and the whole frame is floor tiles + a slice of furniture — a headless "where am I" frame
+  (`office-inside-yaw+180.png`, `pub2-inside-yaw+180.png`).
+- Pitch-up swipe in the office: the camera drops BELOW the interior floor and looks up through the (single-sided,
+  back-face-culled) slab: outside cobbles + slab edge in the lower third, hero far away up the stairwell
+  (`office-inside-pitchup.png`). That is a mesh clip, not just a tight frame.
+- Pitch-down is still the hat-and-shoulders frame reported last time (`office-inside-pitchdown.png`).
+**Root cause (engine, `main.gd`).** `CAM_DIST 8.5` at `cam_pitch −0.55` wants the lens **4.4 m above the head pivot
+(CAM_HEAD 1.5) = ~6 m above the floor**; under a 3.0 m ceiling the SpringArm can only reach
+≈(3.0 − 0.3 margin − 1.5)/sin 0.55 ≈ **2.3 m**, at which a 1.78 m hero is ~65 % of a 62° vertical FOV. The hero is only
+hidden below `cd > 1.35`. The pitch-up clip means the interior floor plate / stair core is not stopping the arm
+(margin 0.3 vs a thin slab, or the stairwell void) — verify which body the arm passed. Data (`floor_height: 3.0`,
+`interior.floor_z`) is per brief and fine; nothing in world.json can address this.
+**Fix (engine).** Detect an overhead hit (short upward ray from the head, or `cam_spring.get_hit_length() < CAM_DIST`
+with the hit above the pivot) and while indoors: clamp pitch to ≈ −0.15…−0.25 and target arm ≈ 3.5–4 m, ease back
+outdoors; fade the hero (dither/alpha) between 1.35 and ~2.4 m instead of a hard hide; make the SpringArm ignore
+ceilings/upper-floor slabs (layer them separately) so it slides along the wall instead of the ceiling; include the
+interior floor slab in the arm's mask/margin so pitch-up cannot go under it. Same rig serves the chandlery/house
+interiors (3.0 m, not separately driven) and the cave arena (5 m — headroom ≈6 m, mostly OK).
 
-### ❗ P1-2 — Region toasts print raw ids: `harbour`, `smugglers_cove`, `chapel_hill`
-**Symptom.** The region toast shows `regions[].name` verbatim (`p2-start-a.png`: "harbour"). Entering the cove will
-print **`smugglers_cove`**, the hill **`chapel_hill`**, the moor `moor`, the pub `pub`. Underscored lower-case ids
-on a phone screen read as debug text. (The toast IS transient — 2.2 s + fade — so ✅ on "not pinned".)
-**Root cause.** `game_shell._update_region()` → `_toast(best, 2.2)` with no display-name field.
-**Fix (world.json).** Rename regions to display strings and update every rule `target` that references them
-(matching is exact-string in `rules._when_matches`): `"harbour"`→`"The Harbour"`, `"town"`→`"Kestrel Bay"`,
-`"headland"`→`"Kestrel Point"` (+ `r_light.when.target`), `"chapel_hill"`→`"Chapel Hill"`,
-`"smugglers_cove"`→`"Smugglers' Cove"` (+ `r_cove`, `r_cove_spawn` targets), `"moor"`→`"The Moor"`,
-`"pub"`→`"The Kestrel Arms"`. `quests.json` `reach_area c9_-6` is a cell id, unaffected.
+### ❗ P1-2 — Default camera pitch puts the horizon at the top edge: the opening frame is a slab + truck, and everything above the horizon (sea, cliffs, town, lighthouse) is off-screen until the player pitches up (engine; data cannot fix)
+**Symptom.** At default pitch (−0.55 rad = −31.5°) with `fov 62` (KEEP_HEIGHT → 62° vertical in BOTH orientations)
+the top edge ray is at **−0.5°**: nothing above the horizon is ever in frame. At spawn yaw 90° and 180° the frame is
+**100 % cobble** (`p-spawn-yaw90.png`, `p-spawn-yaw180.png`); the opening frame (yaw 0) is a pale slab, the truck's
+cab and a grey strip (`p-spawn-yaw0.png`, `l-spawn-yaw0.png`) — it does not read as a harbour, and the 2-storey office
+27 m away would subtend 12° above the horizon, i.e. clipped off the top. In portrait the horizontal FOV is only **31°**,
+so it is a keyhole onto the floor. One pitch-up swipe shows the intended picture — cliffs, bushes, sky, buildings
+(`p-spawn-pitch-up.png`, `l-spawn-pitch-up.png`) — which proves the world is there and the default framing hides it.
+The boat-side frame (`boat-before-board.png`, also default pitch, but the ground drops to water) is the only frame
+that reads "harbour", and only because the terrain falls away.
+**Root cause.** `main.gd` `var cam_pitch := −0.55`, `cam.fov = 62.0`, default `keep_aspect`. Data: `quay_spawn` is
+[x,z] only (no spawn yaw) and `cam_yaw` starts at 0 (look −z); the harbour water lies WEST of the quay
+(`heights.csv`: water x<0, z<12), so no −z-facing spawn can frame it — this is not fixable from world.json.
+**Fix (engine).** Default `cam_pitch ≈ −0.35` (≈ 9° of above-horizon in frame; still a readable ground plane), and
+in portrait widen the vertical FOV (≈ 70–75°, or `KEEP_WIDTH` with a clamp) so the keyhole opens; optionally honour a
+`spawn_yaw`/`quay_spawn:[x,z,yaw]` so a world can open on its hero shot. Data follow-up once that exists: face the
+spawn west toward the boat/office/net shed.
 
-### ❗ P1-3 — Camera walled at spawn and around the harbour office (SpringArm collapses into a wall / a net pile)
-**Symptoms (three, same cause).**
-- **At spawn (24,24), default yaw:** the 8.5 m arm puts the camera at ≈(24,32.5) — inside the **boathouse**
-  footprint (landmark cell [1,2], 12×7 @ (27.4,36.6) rot 135). In landscape the right third of the opening frame
-  is a blank dark-brown slab (`land-start-a.png`, `land-hud.png`); in portrait it is the bottom-left corner
-  (`p2-start-a.png`). The player's very first frame has a wall through it.
-- **Facing away from the office's W wall by the net pile (22.2,18.5):** the arm is squeezed between the office
-  and `net_pile.glb` @ (20.3,17.7) and the camera ends up INSIDE the net-pile mesh — the full frame is net
-  texture + a cream wall slab, hero half-hidden (`p2-pitch-max.png`). This is the "popup mesh" frame.
-- **Spawn view straight ahead** is the office's windowed back wall filling ~50 % of the frame 7 m away
-  (`p2-start-d.png`); walking 6 m south the boathouse wall fills 60 % (`p3-open-neutral.png`). The quay spawn
-  is boxed: office 7 m N, boathouse ~9 m S, net shed ~13 m W.
-**Root cause.** Data: the start cell centre sits between two large landmarks with no 9 m of clear ground behind
-it; bulky Meshy props (net pile, lobster pots, plank pile) are placed within 1–2 m of building walls. Engine:
-SpringArm collides with props (mask) and only hides the HERO when collapsed (`cd > 1.35`), never the prop.
-**Fix (world.json).** (a) Move the boathouse off the spawn axis (e.g. shift cell [1,2]'s landmark ≥ 12 m toward the
-water or rotate it so its long side is not 4 m behind spawn), OR pick a start cell whose −z view is open harbour
-water with ≥ 10 m of clear quay behind it. (b) Keep `net_pile`, `lobster_pots`, `MS_Plank_Pile` ≥ 2.5 m off every
-building wall on the quay (cells 460/428/461). Engine-level (name it to template owners): fade/hide any prop the
-SpringArm has collapsed against, like `_fade_near_camera_enemies()` does for enemies.
+### ❗ P1-3 — The story subtitle is laid out over the thumb buttons in both orientations (engine)
+**Symptom.** `r_start`'s subtitle ("Rain again. The blue truck is on the quay; the road up climbs behind the net
+shed.") — the slot P1-1's fix moved story text into — renders across the button grid: portrait line 1 abuts JUMP,
+line 3 sits on SHEATHE's top edge (`zoom-p-subtitle-overlap.png`, `p-begin+0.7s.png`); landscape "climbs behind" is
+drawn **across the SHEATHE button** and the box spans the USE/ATTACK rows (`zoom-l-subtitle-overlap.png`,
+`l-spawn-yaw0.png`). Every `subtitle` in the world (`r_light`, `r_cove`, `r_cove_path`) uses the same slot.
+**Root cause.** `game_shell.gd:858–861` `_sub_lbl` size `vp.x*0.56` at x `vp.x*0.22`, y `vp.y*0.72` — the comment says
+"clear of the thumb grid" but the grid's left column starts at `vp.x − 2·bw − m − mr` (≈0.54·vp in portrait, ≈0.69 in
+landscape) and rows start at `vp.y*0.69` (portrait) / `0.48` (landscape). No layout query of the buttons.
+**Fix (engine).** Place the subtitle ABOVE the button grid (`y = row3 − label_h − 16`) and cap its width to the
+button column (`x from ml to col_l − 16`), or centre it in the free band between the quest label and row3; give it
+the same `_place_clear` treatment the rules-HUD gets. Data has no lever (no position key on `subtitle`).
 
-### ❗ P1-4 — Top-left stats block is illegible against pale stone / overcast sky (engine-level)
-**Symptom.** "Lv 1 HP 100/100 XP 0/30 Gold 0 / Wpn / Inv" is pale green with no shadow or backing; over the
-office's stone wall or the grey sky it vanishes (`p4-stats-on-stone-zoom.png`, `p8-truck-boarded.png`). The quest
-label directly under it (which HAS a shadow) stays readable in the same frames, proving it is the missing outline.
-In this world nearly every quay frame is pale stone or sky, so it is the common case, not an edge.
-**Root cause.** `main.gd _build_hud`: `stats` Label — `font_color (0.9,1,0.9)`, no `font_shadow_color`/outline
-(the rules-HUD label and quest label do set shadows). Engine-owned.
-**Fix.** Engine: add `font_shadow_color`/`font_outline` (or a 0.45-alpha black backing) to `stats`. No clean data
-mitigation short of `hud_hide: stats` (not recommended — HP would go with it).
+### ❗ P1-4 — Boss bar overprints the stats line and the minimap in portrait (engine)
+**Symptom.** Within `show_within 40` of the ringleader, "THE RINGLEADER" is drawn over "XP 0/30 Gold 0" and the boss HP
+bar runs under the minimap's left edge (`zoom-cove-hud-top.png`, `cove-arrive.png`, `cove-t1.png`).
+**Root cause.** `game_shell.gd:862–872` `_boss_root` at `y=44`, width `min(520, vp.x*0.7)` centred → x 108–612 of 720
+in portrait, while stats occupy x 12–~330 / y 12–100 and the minimap x 521–708 / y 12–199.
+**Fix (engine).** In portrait (vp.x < vp.y) drop the boss bar below the minimap/quest block (y ≈ `below_mm` or
+`vp.y*0.14`) and cap width to `vp.x − 2·mm`; or shrink to the band between stats and minimap (x 340–510). Data has
+no lever (`boss` block has no position).
 
-### ❗ P1-5 — Quest label renders at ~9 CSS px on the phone (engine-level, data mitigation available)
-**Symptom.** The persistent objective text (font 17 in a 720-unit viewport → 17 × 390/720 ≈ **9 px** on a
-390-wide phone; stats 22 → 12 px) wraps to 4 lines and needs squinting (`p2-hud-topleft-zoom.png` is a 3× zoom).
-Both objectives of `settle_in` are shown at once ("[ ] Find the Harbour Master… / [ ] Climb to the town and ask at
-the Kestrel Arms") — the second is noise until the first is done.
-**Root cause.** `game_shell.gd:133` `_label("", 17, …)` and `_relayout` width `min(430, vp.x*0.55)`; engine.
-**Fix.** Engine: quest font ≥ 22 units. Data (quests.json): shorten step `desc` so one line fits —
-"Find Alwyn in the harbour office" / "Ask at the Kestrel Arms up the hill" — and rely on the label showing only the
-current step if the engine supports it (it currently prints `quest.current_objective()` = every open step).
+### ❗ P1-5 — Top-left stats block still illegible (engine; unchanged from previous P1-4)
+`main.gd:3778–3781` `stats` still `font_color (0.9,1,0.9)` with no `font_shadow_color`/outline. Over sky it is gone
+(`zoom-p-stats-on-sky.png`), over shingle/pale stone nearly so (`boat-before-board.png`). The HP number lives here.
+**Fix (engine).** Add shadow/outline (as the quest label and rules-HUD labels already have) or a 0.45-alpha backing.
 
-### ❗ P1-6 — Interior pitch-down = full-frame hero (engine-level camera clamp)
-**Symptom.** Inside the harbour office (7 m room, arm collapsed to ~1.5–2.5 m) a half-screen downward swipe
-reaches `CAM_PITCH_MIN` and the hero's hat + back fill the entire frame, floor behind (`p9-office-pitchdown.png`).
-The same swipe outdoors is fine (`p3-open-pitch-max.png`: hero small, ground visible). Neutral interior framing is
-cramped but usable (`p9-office-inside-2.png`, `p9-office-pitchup.png`: stairs/ceiling/room readable, hero ~55 % of
-frame height). On entering, the first interior frame is a point-blank floor smear with the hero hidden
-(`p9-office-inside.png`) until you take a step.
-**Root cause.** `main.gd` pitch floor −1.05 is tuned for the 8.5 m arm; when a wall shortens the arm the same
-pitch puts the lens on the hero's shoulder; hero is only hidden below 1.35 m.
-**Fix (engine).** Scale the pitch floor with the current arm length (e.g. clamp to −0.6 when `cd < 3`), or raise
-the hero-fade threshold to ~2.2 m indoors. Data: nothing in world.json addresses this; interiors are 3.0 m floors
-per the brief and that is fine.
+### ❗ P1-6 — Quest label still ~9 CSS px and prints every open objective (engine; previous P1-5)
+`game_shell.gd:133` `_label("", 17, …)` → 17 × 390/720 ≈ 9 px on the phone; both `settle_in` objectives shown at once.
+Data mitigation is in (one-line descs). **Fix (engine).** ≥ 22 units; show only the current step.
 
-### ⚠️ P2-1 — `SMUGGLERS DOWN 0` readout: wrong place in portrait, on the title screen, and irrelevant for the first 20 minutes
-- Portrait: `pos: top_right` collides with the minimap, then the stats block, and `_place_clear` drops it to the
-  very bottom-right edge **under ATTACK at y≈828/844** (`p2-start-a.png`; log `GOGI_HUD_FIT smugglers_down moved
-  434,47 -> 434,1508`). In a standalone/PWA launch (`apple-mobile-web-app-capable`, `viewport-fit=cover`) that is the
-  home-indicator band. Landscape is fine (left of the minimap, `land-hud.png`).
-- It is drawn ABOVE the title overlay (`p1-title.png`, bottom-right) — HUD text visible on the title screen.
-- It is pinned from second 0 on the quay where there are no smugglers; persistent clutter on a small screen.
-**Fix (world.json).** `hud[0].pos` → `"bottom_left"` (clear of minimap/stats/buttons at both aspects — the left
-half only hosts the invisible floating joystick) and gate it: `r_start.then` add `{"hud_hide": "smugglers_down"}`,
-`r_cove_spawn.then` add `{"hud_show": "smugglers_down"}` (both actions exist in `rules.gd`).
+### ⚠️ P2-1 — Chain toast still clobbered by the region toast (residual of previous P1-1)
+"Find the Harbour Master - his office is on the quay" (5 s) is replaced by "The Harbour" ~1.5 s in
+(`p-begin+2.5s.png`). Harmless now that the objective is in the quest label, but the single-slot `_toast` is the same
+bug. **Fix (data):** drop `chain[0].toast` (redundant with the quest label). Engine: queue toasts / don't let a 2.2 s
+region toast pre-empt a longer authored one.
 
-### ⚠️ P2-2 — Inventory line is noise and mismatched: `Inv: Rusty Sword, [Boat Hook]`
-The engine-default `rusty_sword` sits in the inventory; `world.weapons.rusty_sword` renames it "Gutting Knife"
-but the HUD still prints "Rusty Sword" (stats refreshed before the weapon catalog merge; engine nit). It also makes
-`weapon_count()==2`, which can surface a "WEAPON >" cycle button.
-**Fix (world.json).** `r_start.then` add `{"remove_item": "rusty_sword"}` → line becomes `Inv: [Boat Hook]`,
-one weapon, no cycle button. (Or drop the `rusty_sword` entry from `weapons` if you keep it.)
+### ⚠️ P2-2 — `SMUGGLERS DOWN 0` drawn above the title overlay until `start` fires (residual of previous P2-1)
+`l-title.png`, `l-begin+0.8s.png` (bright label over a black transition frame). `hud_hide` cannot run before `start`.
+**Fix (engine):** rules-HUD readouts respect `shell.input_locked()`/title visibility, or accept an initial
+`"hidden": true` on `hud[]` entries. Also the title `bg` alpha 0.94 lets the button grid/stats ghost through
+(`p-title.png`) — cosmetic.
 
-### ⚠️ P2-3 — First-run: spawn faces the office's BACK wall; the door is on the far (NE) side
-The player spawns 7 m from the office looking at its windowed n-face; the only door (s-face, centre −2.2) is on
-the NE side facing uphill, ~15 m walk around (`p2-start-d.png` vs `p7-office-door.png`). The n-face window at
-sill 0.9 even reads like a doorway from a low camera (`p4-office-door.png`) and lures the player into the wall +
-net-pile corner of P1-3. The door itself works: "USE > Door" prompt, opens, "USE > Close Door", 1.1 m clear
-opening (`p8-office-door-open.png`), and the harbour master talk fires `r_talk_master` with a non-modal toast +
-"Alwyn Rees is speaking…" (`p9-office-talk.png`). Time-to-first-interaction is fine once you know where to go.
-**Fix (world.json).** Rotate the office 180° (`rot: 315` → `135`, footprint identical; re-check the plinth
-`rows` and Mason's "door on the uphill side" rule) so the door faces the quay/spawn, or move `start_cell` so the
-default −z view frames water + jetty + boat instead of a wall.
-**QA cross-note:** in all five interior frames within 0.7 m of Alwyn (talk prompt live) no NPC body is visible —
-only a thin white vertical bar stands where he should be (`p9-office-master.png`, `p9-office-inside-look.png`).
-Check that `harbour_master.glb` actually loads/scales and is not under the raised (y≈4.1) interior floor.
-
-### ⚠️ P2-4 — Truck: driver's torso pokes through the cab roof
-`p8-truck-boarded.png` / `p8-truck-drive.png`: the hero sits visibly above the cab. Chase-cam itself is right
-(settles to `vehicle.rotation.y + π`, truck framed from behind/above). **Fix (world.json):** author
-`vehicles[0].seat: [x, y, z]` (self-local metres, `vehicle.gd` honours it verbatim) ~0.4 m lower / inside the cab.
+### ⚠️ P2-3 — BEGIN before `_world_ready` shows the un-teleported hero at start_cell for a beat
+`toast-begin+1.5s.png`: hero at (24,24) with "Inv: Gutting Knife, [Boat Hook]" and SMUGGLERS DOWN visible, then the
+mode applies and teleports to `quay_spawn`. `_choose()` only calls `_apply_mode()` if `_world_ready`; otherwise the
+world shows first. In this 1-fps container that gap was seconds; on a phone it is likely a frame or two, but a fast
+tapper on a slow network will see it. **Fix (engine):** keep the title veil up until `_apply_mode` has run.
 
 ---
 
@@ -141,25 +135,40 @@ Check that `harbour_master.glb` actually loads/scales and is not under the raise
 
 | Dimension | Result | Evidence |
 |---|---|---|
-| 1. Camera never walls the view | ❗ P1-3, P1-6 | spawn slab, net-pile popup, interior pitch-down |
-| 1b. Orbit / pitch | ✅ | −100 px right-half touch drag → Δyaw **+1.108 rad** (spec ≈1.11). Outdoor pitch extremes: down = hero small + ground (`p3-open-pitch-max.png`); up (+0.25) = hero large against wall, horizon kept (`p4-pitchup-mouse.png`). No sky-stare, no scalp-only outdoors. |
-| 1c. Vehicle chase cam | ✅ | truck boarded via touch USE at 3 m (`in_vehicle true`), drove 6 m, cam yaw 3.14 = behind (`p8-truck-drive.png`) |
-| 1d. Switchback slope | ⚠️ not framed | reached the slope once at (21,45) y=7.3 with pitch at my own extreme (`p3`), inconclusive — see "could not verify" |
-| 2. HUD fits a phone | ❗ P1-4, P1-5; ⚠️ P2-1, P2-2 | portrait + landscape captures; `GOGI_HUD_GRID` portrait `rows 1074/1222/1370` of 1558, landscape `345/457/568` of 720 → all three button rows on-screen at both aspects; landscape bottom edge 368/400 |
-| 2b. No overlap / clipping | ✅ | stats↔HP bar touch but do not overlap (zoom), quest under bar, minimap clear, `GOGI_HUD_FIT` resolved (no `UNRESOLVED`) |
-| 2c. No debug text | ✅ | no fps/coords/print-to-screen; `hud_debug` off; `dismount_rect` etc. only in the JS hook |
-| 2d. Title screen | ✅ (⚠️ P2-1 leak) | kicker/name/tagline/BEGIN/caption/hint fit at 390×844 (`p1-title.png`) and 860×400 (`land-start-a.png`, hint bottom at 368/400 — tight if a browser toolbar eats height); name wraps to two lines at both aspects, acceptable |
-| 3. Touch one-handed | ✅ | left-half touch-hold moved the player **5.84 m along camera-forward (cos 0.95)**; JUMP tap → `on_floor false`, y+; ATTACK tap → `anim: attack`; USE tap opened door / boarded truck / talked; a 120 px drag STARTING on the USE button gave **Δyaw 0.000** (button owns the touch) |
-| 4. Transient vs persistent | ❗ P1-1/P1-2 (content), ✅ (mechanics) | region toast fades after 2.2 s (`p2-toastband-c.png` empty); quest label persistent by design; talk prompt disappears out of range; "Alwyn Rees is speaking…" clears when audio ends (not timed here) |
-| 5. Damage non-modal | ✅ (code) | `take_damage` → SFX + 0.15 shake + direction arc; `_flash_hurt` is a no-op; `r_died` toast + respawn, no dialog. Not driven — no enemies near spawn in this container's time budget |
+| 1. Camera never walls the view — spawn/quay | ✅ | 4 yaws × 2 aspects + pitch extremes at (39.5,36); shed_a, benches, lamp posts, drums all clear of the arm |
+| 1. Camera — interiors (office, pub) | ❗ P1-1 | hero 65–80 % at neutral, floor smear behind, floor clip on pitch-up |
+| 1. Camera — default framing | ❗ P1-2 | horizon at top edge; yaw-90/180 = 100 % cobble |
+| 1b. Orbit / pitch | ✅ | 142 css-px right-half drag → Δyaw **+1.573 rad** (portrait) / **+1.534** (landscape); pitch-down outdoors = hero small + ground (`p-spawn-pitch-down.png`); pitch-up = horizon kept, no sky-only frame (`p-spawn-pitch-up.png`) |
+| 1c. Vehicle chase cam (truck) | ✅ | boarded via touch USE at 2.7 m (`in_vehicle true`, cam_yaw snapped to 3.14 = behind), DISMOUNT appears in the left column; cam behind/above while driving (`truck-boarded.png`, `truck-drive-1.png`, `slope-boarded.png`); driver seated in cab |
+| 1d. Switchback slope framing | ⚠️ not framed | see "could not verify" |
+| 1e. Boat chase cam | ⚠️ not framed | see "could not verify" |
+| 2. HUD fits a phone — grid | ✅ | `GOGI_HUD_GRID` portrait rows 1074/1222/1370 of 1558, landscape 345/457/568 of 720 → all three rows on-screen both aspects; landscape bottom edge 662/720 |
+| 2. HUD — overlaps | ❗ P1-3, P1-4 | subtitle × buttons; boss bar × stats/minimap |
+| 2. HUD — legibility | ❗ P1-5, P1-6 | stats no shadow; quest 9 px |
+| 2. HUD — SMUGGLERS DOWN | ✅ | bottom_left, hidden until the cove, clear of buttons/joystick (`cove-arrive.png`) |
+| 2. No debug text | ✅ | no fps/coords/print-to-screen in any frame; `hud_debug` off; `dismount_rect` etc. only in the JS snapshot |
+| 2. Title screen | ✅ (⚠️ P2-2 leak) | kicker/name/tagline/BEGIN/caption/hint fit at both aspects (`p-title.png`, `l-title.png`); BEGIN reachable one-handed |
+| 3. Touch one-handed | ✅ | left-half hold moved the player **13.68 m along camera-forward (cos 1.00)** in 5 s; JUMP tap → vy **+5.9**, apex +1.7 m, landed (`toast.out` samples); ATTACK tap → `anim attack`; USE tap opened/closed doors and boarded the truck; a 120 px drag STARTING on USE → **Δyaw 0.000** |
+| 3b. Hold joystick → USE → release | ✅ | USE fired mid-walk (door), released → **0.00 m** drift in 2.5 s, anim idle (`pub2-after-release.png`); no modal panels exist in this world so the `_release_touch_state()` lock path is code-verified only |
+| 4. Transient vs persistent | ✅ | "The Harbour" and "The Kestrel Arms" appear on entry and are gone by +5 s (`toast-cross+0.3s.png` → `toast-cross+5s.png`); nothing pinned except the quest label (by design) and the gated SMUGGLERS DOWN; `r_cove`/`r_cove_spawn` fired at the cove (`cove.log`) |
+| 5. Damage non-modal | ✅ | at the cove HP went 100 → 4 → died → `r_died` respawn toast, no dialog/banner; `take_damage` = SFX + 0.15 shake + direction arc (`_flash_hurt` is a no-op — feedback is subtle but non-modal) (`cove-arrive.png`, `cove-look90.png`, `cove.log`) |
+| First minute | ⚠️ | truck IS discoverable in the opening frame (top-left, both aspects) and the story subtitle survives the region toast; but the frame does not read as a harbour (P1-2) and the subtitle sits on the buttons (P1-3) |
 
 ## Could not verify (sandbox limits)
-- Real-device notch / home-indicator insets (web `_safe_insets()` returns zero; P2-1's bottom-edge placement is
-  inferred from geometry, not a device).
-- True multi-touch feel (joystick + look simultaneously) and gesture latency at 60 fps — container ran at 1–4 fps.
-- Switchback road framing, boat chase-cam, pub interior and the cove/boss: travel time at 1–4 fps exceeded the
-  budget; the camera behaviour there is the same SpringArm rig, so P1-3/P1-6 apply wherever walls are within 8.5 m.
-- 430×932: same aspect as 390×844 to 0.2 % and the engine lays out in a 720-unit short side, so the viewport is
-  720×1560 vs 720×1558 — layout is identical to the portrait captures; not separately rendered.
-- Colour, exposure, texture quality (SwiftShader). The boathouse/net-shed "timber" reads as a flat dark-brown slab
-  here; judge on a GPU before calling it a material bug.
+- **Switchback chase cam**: with the truck parked at the slope foot (test copy) it rolled back / jammed among the
+  fish-crate + dinghy props at ~(55,48) under 1–3 fps physics and never climbed the 27 % grade (56,56)→(72,56)
+  (`slope2-drive-*.png`). I cannot tell container physics from a traction problem — **QA cross-note**: confirm the
+  `car` profile climbs that grade on device (Jory's "don't stall it on the switchback" line suggests the author knows).
+- **Boat chase cam**: standing on the shingle 5.6 m from the boat origin (−7,2.7) two touch USE presses did not board
+  (`boat-before-board.png`); the player then swam. **QA cross-note**: check the boarding reach from the mooring/jetty.
+- Chandlery / chapel / house interiors and the cave arena were not driven; the P1-1 rig behaviour is geometric
+  (ceiling < 6 m) so it applies to every 3.0–3.2 m interior; the chapel (7.4 m) and cave (5 m) should mostly clear.
+- Kestrel Point / Chapel Hill / The Moor / Cove Path toasts not walked (same `_update_region` path as the two verified).
+- Real-device notch/home-indicator insets (`_safe_insets()` is zero on web), true multi-touch feel, 60 fps latency,
+  colour/exposure (SwiftShader).
+- Streaming artefacts seen here and NOT filed as feel defects: ground/collider under the spawn absent for 60–70 s
+  (`ray −1`, player held by analytic ground-stick, `l-ground-60s.png`), buildings appearing 100 s+ after arrival,
+  straight chunk seams (`cove-t6.png`). At phone frame rates these are sub-second; QA owns streaming.
+- Art cross-notes (not my dimension): tall spiky green "cactus"-like tufts on the cliff/slope (`slope-boarded.png`),
+  a heather clump on the asphalt directly in front of the pub door (`toast-cross+0.3s.png`), pub window glass rendering
+  as opaque white quads (`pub2-inside-neutral.png`).

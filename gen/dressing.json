@@ -1,0 +1,1759 @@
+{
+ "cells": [
+  {
+   "cell": [
+    -9,
+    9
+   ],
+   "props": [
+    {
+     "url": "props/vostok_extra/MS_Cabinet_Basic.glb",
+     "pos": [
+      0.12,
+      -5.906
+     ],
+     "rot": 333.4,
+     "group": "keeper_cabinet",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Candle.glb",
+     "pos": [
+      0.075,
+      1.0,
+      -5.817
+     ],
+     "rot": 243.4,
+     "collider": false,
+     "group": "keeper_cabinet",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/coat_rack_oilskins.glb",
+     "pos": [
+      2.086,
+      -4.027
+     ],
+     "rot": 288.4,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Crate.glb",
+     "pos": [
+      -2.857,
+      -1.078
+     ],
+     "rot": 333.4,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/kitchen_table_set.glb",
+     "pos": [
+      -2.299,
+      3.4,
+      -0.407
+     ],
+     "rot": 333.4,
+     "group": "keeper_table",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      -3.506,
+      3.4,
+      -1.011
+     ],
+     "rot": 63.4,
+     "sit": true,
+     "group": "keeper_table",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/iron_bed.glb",
+     "pos": [
+      0.209,
+      6.8,
+      -5.414
+     ],
+     "rot": 243.4,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/washstand.glb",
+     "pos": [
+      -1.851,
+      6.8,
+      -0.183
+     ],
+     "rot": 153.4,
+     "furn": true
+    }
+   ],
+   "npc": {
+    "id": "keeper",
+    "name": "Tamsin",
+    "model": "/cloud-q7026dnarajiwk7glrcg/models/meshy/villager_old.glb",
+    "gender": "female",
+    "age": "elder",
+    "persona": "Tamsin Rowe, 58, keeper of the Kestrel Point lighthouse on the headland. Solitary, precise, watches weather and sea, has seen the smugglers' lights at the caves down the coast. One or two short sentences.",
+    "lines": [
+     "Tamsin: Stairs go all the way up. Hold the rail - the wind gets in."
+    ],
+    "activity": "idle",
+    "pos": [
+     -1.446,
+     -5.684
+    ]
+   }
+  },
+  {
+   "cell": [
+    -3,
+    5
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/kitchen_table_set.glb",
+     "pos": [
+      4.7,
+      6.6
+     ],
+     "rot": 180,
+     "group": "house_table",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      4.7,
+      5.85
+     ],
+     "rot": 0,
+     "sit": true,
+     "group": "house_table",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      4.7,
+      7.35
+     ],
+     "rot": 180,
+     "sit": true,
+     "group": "house_table",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      3.75,
+      6.6
+     ],
+     "rot": 90,
+     "sit": true,
+     "group": "house_table",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Carpet.glb",
+     "pos": [
+      4.7,
+      6.6
+     ],
+     "rot": 270,
+     "collider": false,
+     "group": "house_table",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/welsh_dresser.glb",
+     "pos": [
+      1.75,
+      6.4
+     ],
+     "rot": 90,
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    -3,
+    6
+   ],
+   "props": [
+    {
+     "url": "props/vostok_extra/MS_Fireplace_Tower.glb",
+     "pos": [
+      1.95,
+      -7.4
+     ],
+     "rot": 90,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/coat_rack_oilskins.glb",
+     "pos": [
+      5.6,
+      -6.17
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/iron_bed.glb",
+     "pos": [
+      2.45,
+      2.9,
+      -7.2
+     ],
+     "rot": 90,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/wardrobe_pine.glb",
+     "pos": [
+      4.5,
+      2.9,
+      -6.29
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/washstand.glb",
+     "pos": [
+      6.3,
+      2.9,
+      -6.26
+     ],
+     "rot": 180,
+     "group": "house_wash",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Candle.glb",
+     "pos": [
+      6.3,
+      3.85,
+      -6.26
+     ],
+     "rot": 180,
+     "collider": false,
+     "group": "house_wash",
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    -2,
+    5
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/bar_stool.glb",
+     "pos": [
+      7.0,
+      4.0
+     ],
+     "rot": 180,
+     "sit": true,
+     "group": "pub_bar",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Fireplace_Tower.glb",
+     "pos": [
+      6.45,
+      7.0
+     ],
+     "rot": 90,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/iron_bed.glb",
+     "pos": [
+      6.95,
+      3.2,
+      7.4
+     ],
+     "rot": 90,
+     "furn": true
+    }
+   ],
+   "npc": {
+    "id": "regular",
+    "name": "Dai",
+    "model": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_regular.glb",
+    "gender": "male",
+    "age": "adult",
+    "persona": "Dai Penrose, 55, retired deckhand who sits at the bar of the Kestrel Arms every afternoon. Sentimental, slightly slurred, tells sea stories, knows the smugglers use the sea caves past the wreck. One or two short sentences.",
+    "lines": [
+     "Dai: Another? Go on then. I'll tell you about the night the Marguerite went on the rocks."
+    ],
+    "seated": true,
+    "pos": [
+     7.0,
+     0.3,
+     4.0
+    ]
+   }
+  },
+  {
+   "cell": [
+    -2,
+    6
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/washstand.glb",
+     "pos": [
+      6.26,
+      3.2,
+      -6.7
+     ],
+     "rot": 90,
+     "group": "pub_roomC",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Candle.glb",
+     "pos": [
+      6.26,
+      4.15,
+      -6.7
+     ],
+     "rot": 180,
+     "collider": false,
+     "group": "pub_roomC",
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    -1,
+    5
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_back_bar.glb",
+     "pos": [
+      -7.4,
+      1.4
+     ],
+     "rot": 0,
+     "group": "pub_bar",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_bar_counter.glb",
+     "pos": [
+      -7.4,
+      3.1
+     ],
+     "rot": 0,
+     "group": "pub_bar",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/bar_stool.glb",
+     "pos": [
+      -7.4,
+      4.0
+     ],
+     "rot": 180,
+     "sit": true,
+     "group": "pub_bar",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/bar_stool.glb",
+     "pos": [
+      -6.1,
+      4.0
+     ],
+     "rot": 180,
+     "sit": true,
+     "group": "pub_bar",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Dartboard.glb",
+     "pos": [
+      -3.0,
+      1.55,
+      0.99
+     ],
+     "rot": 0,
+     "collider": false,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_table_round.glb",
+     "pos": [
+      -7.0,
+      7.0
+     ],
+     "rot": 180,
+     "group": "pub_t1",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      -7.0,
+      6.3
+     ],
+     "rot": 0,
+     "sit": true,
+     "group": "pub_t1",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      -6.3,
+      7.0
+     ],
+     "rot": 270,
+     "sit": true,
+     "group": "pub_t1",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Candle.glb",
+     "pos": [
+      -7.0,
+      0.8,
+      7.0
+     ],
+     "rot": 180,
+     "collider": false,
+     "group": "pub_t1",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_table_round.glb",
+     "pos": [
+      -2.0,
+      6.8
+     ],
+     "rot": 180,
+     "group": "pub_t2",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      -2.0,
+      6.1
+     ],
+     "rot": 0,
+     "sit": true,
+     "group": "pub_t2",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      -2.0,
+      7.45
+     ],
+     "rot": 180,
+     "sit": true,
+     "group": "pub_t2",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      -2.7,
+      6.8
+     ],
+     "rot": 90,
+     "sit": true,
+     "group": "pub_t2",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_table_round.glb",
+     "pos": [
+      0.4,
+      4.9
+     ],
+     "rot": 180,
+     "group": "pub_t4",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      0.4,
+      4.2
+     ],
+     "rot": 0,
+     "sit": true,
+     "group": "pub_t4",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      0.4,
+      5.6
+     ],
+     "rot": 180,
+     "sit": true,
+     "group": "pub_t4",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      -0.3,
+      4.9
+     ],
+     "rot": 90,
+     "sit": true,
+     "group": "pub_t4",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Carpet.glb",
+     "pos": [
+      -4.0,
+      3.2,
+      6.5
+     ],
+     "rot": 270,
+     "collider": false,
+     "furn": true
+    }
+   ],
+   "npc": {
+    "id": "barmaid",
+    "name": "Morwenna",
+    "model": "/cloud-q7026dnarajiwk7glrcg/models/meshy/barmaid.glb",
+    "gender": "female",
+    "age": "adult",
+    "persona": "Morwenna Tregear, 46, runs the Kestrel Arms pub on the High Street of Kestrel Bay, a rainy cliff-top fishing town. Sharp-tongued but kind, hears every rumour. Her late husband was lost at sea. Plain speech, one or two short sentences, dry wit.",
+    "lines": [
+     "Morwenna: Wipe your boots. Rain's been at it three days.",
+     "Morwenna: Rooms are upstairs if you want one. Don't mind Dai - he's been on that stool since the Marguerite went down."
+    ],
+    "activity": "idle",
+    "pos": [
+     -6.9,
+     2.1
+    ]
+   }
+  },
+  {
+   "cell": [
+    -1,
+    6
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_table_round.glb",
+     "pos": [
+      -5.5,
+      -7.0
+     ],
+     "rot": 180,
+     "group": "pub_t3",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      -5.5,
+      -6.3
+     ],
+     "rot": 180,
+     "sit": true,
+     "group": "pub_t3",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      -6.2,
+      -7.0
+     ],
+     "rot": 90,
+     "sit": true,
+     "group": "pub_t3",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      -4.8,
+      -7.0
+     ],
+     "rot": 270,
+     "sit": true,
+     "group": "pub_t3",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Candle.glb",
+     "pos": [
+      -5.5,
+      0.8,
+      -7.0
+     ],
+     "rot": 180,
+     "collider": false,
+     "group": "pub_t3",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/coat_rack_oilskins.glb",
+     "pos": [
+      -2.15,
+      -6.18
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/wardrobe_pine.glb",
+     "pos": [
+      -6.6,
+      3.2,
+      -6.29
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/iron_bed.glb",
+     "pos": [
+      -5.2,
+      3.2,
+      -6.95
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/washstand.glb",
+     "pos": [
+      -3.5,
+      3.2,
+      -6.26
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/wardrobe_pine.glb",
+     "pos": [
+      -1.8,
+      3.2,
+      -6.29
+     ],
+     "rot": 180,
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    0
+   ],
+   "props": [
+    {
+     "url": "props/vostok_extra/MS_Plank_Pile.glb",
+     "pos": [
+      3.619,
+      7.432
+     ],
+     "rot": 225,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Cable_Reel.glb",
+     "pos": [
+      0.932,
+      4.603
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/cart_wooden.glb",
+     "pos": [
+      -2.038,
+      7.149
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/harbour_bench.glb",
+     "pos": [
+      -6.62,
+      -2.38
+     ],
+     "rot": 0,
+     "sit": true,
+     "furn": true
+    }
+   ],
+   "npc": {
+    "id": "old_salt",
+    "name": "Old Hal",
+    "model": "/cloud-q7026dnarajiwk7glrcg/models/meshy/fisher_seated_old.glb",
+    "gender": "male",
+    "age": "elder",
+    "persona": "Hal Curnow, 72, retired fisherman who sits on the bench on the harbour quay of Kestrel Bay every day watching the boats. Slow, philosophical, loves the town, remembers when the herring ran. One or two short sentences.",
+    "lines": [
+     "Hal: Sit. The tide's on the turn. Best time to watch."
+    ],
+    "pos": [
+     -6.62,
+     -2.38
+    ],
+    "seated": true
+   }
+  },
+  {
+   "cell": [
+    0,
+    1
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/net_pile.glb",
+     "pos": [
+      1.285,
+      -6.942
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/harbour_bench.glb",
+     "pos": [
+      7.331,
+      -6.2
+     ],
+     "rot": 315,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Sawbuck.glb",
+     "pos": [
+      6.093,
+      -5.386
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/rope_coil_large.glb",
+     "pos": [
+      7.154,
+      -0.366
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/buoy_cluster.glb",
+     "pos": [
+      7.296,
+      3.877
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/buoy_cluster.glb",
+     "pos": [
+      -1.331,
+      -5.74
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/lobster_pots.glb",
+     "pos": [
+      3.124,
+      1.402
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/lobster_pots.glb",
+     "pos": [
+      4.538,
+      2.816
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/lobster_pots.glb",
+     "pos": [
+      -2.604,
+      -4.326
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/fish_crates.glb",
+     "pos": [
+      5.74,
+      4.018
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/fish_crates.glb",
+     "pos": [
+      -1.26,
+      -2.982
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/oil_drums_rusty.glb",
+     "pos": [
+      -3.877,
+      -6.588
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/net_pile.glb",
+     "pos": [
+      -4.301,
+      -2.77
+     ],
+     "rot": 135,
+     "furn": true
+    }
+   ],
+   "npc": {
+    "id": "netman",
+    "name": "Pasco",
+    "model": "/cloud-q7026dnarajiwk7glrcg/models/meshy/fisher_working.glb",
+    "gender": "male",
+    "age": "adult",
+    "persona": "Pasco Hocking, 41, working fisherman mending nets by the net shed on the quay of Kestrel Bay. Practical, worried about money, blunt. One or two short sentences.",
+    "lines": [
+     "Pasco: Mind the nets. Took me all morning."
+    ],
+    "activity": "idle_work",
+    "holds": "/cloud-q7026dnarajiwk7glrcg/models/meshy/mending_net_hand.glb",
+    "pos": [
+     -3.0,
+     -1.2
+    ]
+   }
+  },
+  {
+   "cell": [
+    0,
+    5
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_bar_counter.glb",
+     "pos": [
+      4.18,
+      6.7
+     ],
+     "rot": 90,
+     "group": "shop_counter",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Candle.glb",
+     "pos": [
+      4.18,
+      1.15,
+      5.7
+     ],
+     "rot": 180,
+     "collider": false,
+     "group": "shop_counter",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Crate.glb",
+     "pos": [
+      7.45,
+      5.9
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Crate.glb",
+     "pos": [
+      7.45,
+      4.75
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/fish_crates.glb",
+     "pos": [
+      7.45,
+      7.4
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Crate.glb",
+     "pos": [
+      4.25,
+      3.95
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/anchor_old.glb",
+     "pos": [
+      3.7,
+      3.15
+     ],
+     "rot": 180,
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    0,
+    6
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/rope_coil_large.glb",
+     "pos": [
+      6.55,
+      -6.6
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/rope_coil_large.glb",
+     "pos": [
+      3.55,
+      -6.6
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/iron_bed.glb",
+     "pos": [
+      3.9,
+      3.0,
+      -7.1
+     ],
+     "rot": 90,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/wardrobe_pine.glb",
+     "pos": [
+      5.55,
+      3.0,
+      -6.29
+     ],
+     "rot": 180,
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    0
+   ],
+   "props": [
+    {
+     "url": "props/vostok_extra/MS_Fireplace_Tower.glb",
+     "pos": [
+      1.855,
+      5.424
+     ],
+     "rot": 45,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/coat_rack_oilskins.glb",
+     "pos": [
+      5.306,
+      6.004
+     ],
+     "rot": 315,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/kitchen_table_set.glb",
+     "pos": [
+      4.436,
+      3.0,
+      6.732
+     ],
+     "rot": 315,
+     "group": "office_kitchen",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      3.906,
+      3.0,
+      7.263
+     ],
+     "rot": 135,
+     "sit": true,
+     "group": "office_kitchen",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      4.967,
+      3.0,
+      6.202
+     ],
+     "rot": 315,
+     "sit": true,
+     "group": "office_kitchen",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Cabinet_Basic.glb",
+     "pos": [
+      2.174,
+      3.0,
+      4.752
+     ],
+     "rot": 45,
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    1
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/harbour_desk.glb",
+     "pos": [
+      4.295,
+      -5.732
+     ],
+     "rot": 135,
+     "group": "office_desk",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/office_chair_wooden.glb",
+     "pos": [
+      5.214,
+      -4.813
+     ],
+     "rot": 225,
+     "sit": true,
+     "group": "office_desk",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Candle.glb",
+     "pos": [
+      4.154,
+      0.85,
+      -5.874
+     ],
+     "rot": 315,
+     "collider": false,
+     "group": "office_desk",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/ledger_shelf.glb",
+     "pos": [
+      6.911,
+      -5.237
+     ],
+     "rot": 225,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Cabinet_Basic.glb",
+     "pos": [
+      4.931,
+      -3.257
+     ],
+     "rot": 225,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/rope_coil_large.glb",
+     "pos": [
+      7.406,
+      -7.288
+     ],
+     "rot": 315,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/iron_bed.glb",
+     "pos": [
+      7.371,
+      3.0,
+      -6.758
+     ],
+     "rot": 225,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/net_pile.glb",
+     "pos": [
+      -4.815,
+      -1.002
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/net_pile.glb",
+     "pos": [
+      -6.654,
+      -2.841
+     ],
+     "rot": 135,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/rope_coil_large.glb",
+     "pos": [
+      -6.3,
+      1.473
+     ],
+     "rot": 135,
+     "furn": true
+    }
+   ],
+   "npc": {
+    "id": "harbour_master",
+    "name": "Alwyn Rees",
+    "model": "/cloud-q7026dnarajiwk7glrcg/models/meshy/harbour_master.glb",
+    "gender": "male",
+    "age": "elder",
+    "persona": "Alwyn Rees, harbour master of Kestrel Bay, 61, Welsh-Cornish, gruff, dry humour, thirty years at sea before he took the office on the quay. Knows every boat and tide. Suspicious about lights seen on the old wreck of the trawler Marguerite down the coast at night - he thinks smugglers are using her and the sea caves. Speaks plainly in one or two short salty sentences. No fantasy language; this is a real rainy fishing town.",
+    "lines": [
+     "Alwyn: You'll be the one asking about the wreck. Sit down before you drip on my charts.",
+     "Alwyn: The Marguerite went aground two winters back. Nobody salvaged her - but somebody's using her.",
+     "Alwyn: Take the boat out if you must. Mind the caves past the wreck. Those aren't fishermen."
+    ],
+    "activity": "idle",
+    "pos": [
+     4.578,
+     -6.864
+    ]
+   }
+  },
+  {
+   "cell": [
+    1,
+    5
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/ledger_shelf.glb",
+     "pos": [
+      -4.25,
+      7.1
+     ],
+     "rot": 270,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/buoy_cluster.glb",
+     "pos": [
+      -4.65,
+      5.1
+     ],
+     "rot": 180,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/lobster_pots.glb",
+     "pos": [
+      -6.65,
+      7.4
+     ],
+     "rot": 270,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/kitchen_table_set.glb",
+     "pos": [
+      -7.05,
+      3.0,
+      7.3
+     ],
+     "rot": 180,
+     "group": "chandler_kitchen",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/pub_chair.glb",
+     "pos": [
+      -7.05,
+      3.0,
+      6.5
+     ],
+     "rot": 0,
+     "sit": true,
+     "group": "chandler_kitchen",
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/welsh_dresser.glb",
+     "pos": [
+      -4.3,
+      3.0,
+      6.0
+     ],
+     "rot": 270,
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    6
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/ledger_shelf.glb",
+     "pos": [
+      -4.25,
+      -7.3
+     ],
+     "rot": 270,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/coat_rack_oilskins.glb",
+     "pos": [
+      -6.9,
+      -6.17
+     ],
+     "rot": 180,
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    1,
+    9
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_pew.glb",
+     "pos": [
+      -6.0,
+      -3.9
+     ],
+     "rot": 0.0,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_pew.glb",
+     "pos": [
+      -2.0,
+      -3.9
+     ],
+     "rot": 0.0,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_pew.glb",
+     "pos": [
+      -6.0,
+      -2.8
+     ],
+     "rot": 0.0,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_pew.glb",
+     "pos": [
+      -2.0,
+      -2.8
+     ],
+     "rot": 0.0,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_pew.glb",
+     "pos": [
+      -6.0,
+      -1.7
+     ],
+     "rot": 0.0,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_pew.glb",
+     "pos": [
+      -2.0,
+      -1.7
+     ],
+     "rot": 0.0,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_pew.glb",
+     "pos": [
+      -6.0,
+      -0.6
+     ],
+     "rot": 0.0,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_pew.glb",
+     "pos": [
+      -2.0,
+      -0.6
+     ],
+     "rot": 0.0,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_pew.glb",
+     "pos": [
+      -6.0,
+      0.6
+     ],
+     "rot": 0.0,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_pew.glb",
+     "pos": [
+      -2.0,
+      0.6
+     ],
+     "rot": 0.0,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_pew.glb",
+     "pos": [
+      -6.0,
+      1.7
+     ],
+     "rot": 0.0,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_pew.glb",
+     "pos": [
+      -2.0,
+      1.7
+     ],
+     "rot": 0.0,
+     "sit": true,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_lectern.glb",
+     "pos": [
+      -2.7,
+      4.8
+     ],
+     "rot": 180.0,
+     "furn": true
+    }
+   ],
+   "npc": {
+    "id": "verger",
+    "name": "Enys",
+    "model": "/cloud-q7026dnarajiwk7glrcg/models/meshy/villager_woman.glb",
+    "gender": "female",
+    "age": "elder",
+    "persona": "Enys Polglase, 63, verger of the chapel on the hill above Kestrel Bay. Quiet, kind, knows the names on every grave in the yard. One or two short sentences.",
+    "lines": [
+     "Enys: Chapel's open. It always is."
+    ],
+    "activity": "idle",
+    "pos": [
+     -6.0,
+     -5.4
+    ]
+   }
+  },
+  {
+   "cell": [
+    1,
+    10
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/chapel_altar.glb",
+     "pos": [
+      -4.0,
+      -5.6
+     ],
+     "rot": 180.0,
+     "group": "altar",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Candle.glb",
+     "pos": [
+      -4.55,
+      1.05,
+      -5.6
+     ],
+     "rot": 0.0,
+     "collider": false,
+     "group": "altar",
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Candle.glb",
+     "pos": [
+      -3.45,
+      1.05,
+      -5.6
+     ],
+     "rot": 0.0,
+     "collider": false,
+     "group": "altar",
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    2,
+    2
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/harbour_bench.glb",
+     "pos": [
+      0.06,
+      -3.06
+     ],
+     "rot": 0,
+     "sit": true,
+     "furn": true
+    }
+   ],
+   "npc": {
+    "id": "deckhand",
+    "name": "Jory",
+    "model": "/cloud-q7026dnarajiwk7glrcg/models/meshy/fisher_seated_young.glb",
+    "gender": "male",
+    "age": "young",
+    "persona": "Jory Nance, 25, young deckhand between trips, sitting on a bench on the quay of Kestrel Bay. Restless, wants to leave for the city, cheeky. Knows the blue truck parked on the quay is free to borrow. One or two short sentences.",
+    "lines": [
+     "Jory: Nothing to do till the boats go out. Take the truck if you want - keys are in it. Don't stall it on the switchback."
+    ],
+    "pos": [
+     0.06,
+     -3.06
+    ],
+    "seated": true
+   }
+  },
+  {
+   "cell": [
+    8,
+    3
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/fish_crates.glb",
+     "pos": [
+      1.9,
+      6.0
+     ],
+     "rot": 270.0,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/lobster_pots.glb",
+     "pos": [
+      1.9,
+      4.4
+     ],
+     "rot": 270.0,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Crate.glb",
+     "pos": [
+      5.3,
+      4.1
+     ],
+     "rot": 0.0,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Pallet.glb",
+     "pos": [
+      6.9,
+      4.3
+     ],
+     "rot": 270.0,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/water_trough_stone.glb",
+     "pos": [
+      3.2,
+      4.15
+     ],
+     "rot": 0.0,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/harbour_bench.glb",
+     "pos": [
+      4.7,
+      5.9
+     ],
+     "rot": 90.0,
+     "sit": true,
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    8,
+    4
+   ],
+   "props": [
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/fish_crates.glb",
+     "pos": [
+      7.4,
+      -5.0
+     ],
+     "rot": 270.0,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/fish_crates.glb",
+     "pos": [
+      1.9,
+      -4.0
+     ],
+     "rot": 270.0,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/lobster_pots.glb",
+     "pos": [
+      1.9,
+      -2.4
+     ],
+     "rot": 270.0,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Crate.glb",
+     "pos": [
+      5.0,
+      -2.1
+     ],
+     "rot": 0.0,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Pallet.glb",
+     "pos": [
+      6.9,
+      -2.3
+     ],
+     "rot": 270.0,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/cart_wooden.glb",
+     "pos": [
+      4.4,
+      -4.6
+     ],
+     "rot": 270.0,
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    9,
+    -6
+   ],
+   "props": [
+    {
+     "url": "props/vostok_extra/MS_Crate.glb",
+     "pos": [
+      -0.235,
+      -2.99
+     ],
+     "rot": 109.4,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Crate.glb",
+     "pos": [
+      -1.231,
+      -5.82
+     ],
+     "rot": 109.4,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/oil_drums_rusty.glb",
+     "pos": [
+      2.117,
+      5.193
+     ],
+     "rot": 109.4,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/rope_coil_large.glb",
+     "pos": [
+      -1.916,
+      6.083
+     ],
+     "rot": 109.4,
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    10,
+    -5
+   ],
+   "props": [
+    {
+     "url": "props/vostok_extra/MS_Crate.glb",
+     "pos": [
+      1.727,
+      7.297
+     ],
+     "rot": 19.4,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/oil_drums_rusty.glb",
+     "pos": [
+      -0.491,
+      7.018
+     ],
+     "rot": 19.4,
+     "furn": true
+    }
+   ]
+  },
+  {
+   "cell": [
+    10,
+    -4
+   ],
+   "props": [
+    {
+     "url": "props/vostok_extra/MS_Campfire.glb",
+     "pos": [
+      -1.109,
+      -6.22
+     ],
+     "rot": 19.4,
+     "collider": false,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Tent_Civilian.glb",
+     "pos": [
+      1.143,
+      -5.847
+     ],
+     "rot": 19.4,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Crate.glb",
+     "pos": [
+      -5.513,
+      -6.684
+     ],
+     "rot": 19.4,
+     "furn": true
+    },
+    {
+     "url": "props/vostok_extra/MS_Crate.glb",
+     "pos": [
+      -4.888,
+      -3.405
+     ],
+     "rot": 109.4,
+     "furn": true
+    },
+    {
+     "url": "/cloud-q7026dnarajiwk7glrcg/models/meshy/oil_drums_rusty.glb",
+     "pos": [
+      -2.935,
+      -3.881
+     ],
+     "rot": 19.4,
+     "furn": true
+    }
+   ]
+  }
+ ]
+}

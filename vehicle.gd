@@ -105,6 +105,10 @@ const MOUNT_MODELS := {
 const PROMPT_RANGE := 2.8    # metres to the CLOSEST HULL POINT — show the floating DRIVE/RIDE label
 const PROMPT_HIDE := 2.85    # ... hide past here (a 0.05 m hysteresis band so an edge-hover can't flicker)
 const GROUND_LIFT := 0.1     # ride just above the surface (same cue as TrafficCar's +0.12)
+const CLIMB_RATE_MAX := 14.0 # m/s of vertical the drive step may take from the gradient. Caps the
+                             # two edge cases sampling one step ahead can hit: a cliff lip (which
+                             # would fling the hull upward) and a cell seam mid-stream (a one-frame
+                             # spike). Well above any real grade at any real speed.
 const SNAP_RATE := 10.0      # y-lerp rate onto the terrain (fast enough to hug, soft enough not to pop)
 
 # --- shared FLIGHT ENVELOPE (plane + dragon) — pinned Wave-3 numbers ---
@@ -1604,6 +1608,30 @@ func _drive(delta: float) -> void:
 # Ground gait — cars/tanks/boats/taxiing planes/walking mounts. Boats replace the terrain target
 # with the water level inside _rest_y (via _snap_to_ground); flyers hand off to _drive_air once
 # past takeoff speed with the throttle held.
+## VERTICAL VELOCITY FROM THE GRADIENT — how a vehicle gets up a hill.
+##
+## `velocity.y` was hard-zeroed here and the height corrected AFTERWARDS by _snap_to_ground's lerp.
+## That ordering is the whole bug: move_and_slide runs first, with the hull still at the height it
+## had at the bottom of the rise, so its box collider drives straight into the slope face and the
+## solver reports a wall. The vehicle stops, and nothing about engine power changes it — accel,
+## max_speed and brake are all irrelevant when the blocker is collision rather than torque.
+## Measured on a 30-57% switchback: stalled on the first steep leg, every attempt, in a truck whose
+## profile says 12 m/s.
+##
+## Sampling the ground one step ahead and putting that rise into the velocity means the hull climbs
+## and advances in the SAME move. _snap_to_ground still runs after, and now only has to settle the
+## last few centimetres instead of fighting a metre of error per frame.
+func _climb_rate(delta: float) -> float:
+	if _airborne or delta <= 0.0:
+		return 0.0
+	var step := Vector3(velocity.x, 0.0, velocity.z) * delta
+	if step.length_squared() < 1e-8:
+		return 0.0
+	var ahead := global_position + step
+	var rise := _ground_h_at(ahead.x, ahead.z) - _ground_h()
+	return clampf(rise / delta, -CLIMB_RATE_MAX, CLIMB_RATE_MAX)
+
+
 func _drive_ground(delta: float, p: Dictionary) -> void:
 	var max_speed := float(p["max_speed"])
 	# POINT-AND-GO (the on-screen joystick, via drive_input_world): turn the body TOWARD the commanded
@@ -1618,7 +1646,7 @@ func _drive_ground(delta: float, p: Dictionary) -> void:
 		var wturn := float(p["turn_rate"]) * (1.0 if bool(p.get("steer_fixed", false)) else 1.7)
 		rotation.y += -_input.x * wturn * delta
 		velocity = global_transform.basis.z * _speed
-		velocity.y = 0.0
+		velocity.y = _climb_rate(delta)
 		move_and_slide()
 		_snap_to_ground(delta)
 		if bool(p.get("fly", false)) and _speed > float(p.get("takeoff", 9.0)) and -_input.y > 0.4:
@@ -1641,7 +1669,7 @@ func _drive_ground(delta: float, p: Dictionary) -> void:
 	# forward = +basis.z: library/Meshy models FACE +Z in this stack (TrafficCar's atan2(dir.x,
 	# dir.z) and the player's look_at(pos - dir) both point +Z along the heading).
 	velocity = global_transform.basis.z * _speed
-	velocity.y = 0.0
+	velocity.y = _climb_rate(delta)
 	move_and_slide()              # buildings/walls (layer 1) stop it; slides along them
 	_snap_to_ground(delta)
 	# TAKEOFF (plane + dragon): past takeoff speed with the throttle still held, pitch up and fly.
@@ -1871,7 +1899,13 @@ func _rest_y() -> float:
 
 
 func _ground_h() -> float:
-	var gy := terrain.height(global_position.x, global_position.z) if terrain != null else 0.0
+	return _ground_h_at(global_position.x, global_position.z)
+
+
+## _ground_h for an arbitrary point — the drive step samples one frame AHEAD of the hull so it can
+## climb into the rise instead of colliding with it. Same water/flyer rules as the in-place version.
+func _ground_h_at(wx: float, wz: float) -> float:
+	var gy := terrain.height(wx, wz) if terrain != null else 0.0
 	# WATER-REST vehicles (boat / spec-"water" seaplane) treat the water surface as their floor, so
 	# a hull/seaplane over open water rides and LANDS on it instead of the seabed far below (2.3).
 	# On the water the floor IS water_level (never the rising seabed, so the boat can't climb the

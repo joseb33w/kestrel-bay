@@ -410,13 +410,14 @@ static func _build_shell(root: Node3D, idict: Dictionary, foot: Vector2, floors:
 	# + the top storey when there is one. Warm, modest range, never shadow-casting.
 	if bool(idict["lit"]):
 		var lrng := clampf(maxf(iw, idz) * 0.75, 6.0, 11.0)   # reach the corners of a wide ground floor
-		core.add_child(_room_light(Vector3(0.0, minf(sh - 0.5, 2.6), 0.0), lrng))
+		var lwall := String(spec.get("material", ""))
+		core.add_child(_room_light(Vector3(0.0, minf(sh - 0.5, 2.6), 0.0), lrng, lwall))
 		if floors >= 2:
-			core.add_child(_room_light(Vector3(0.0, height - 0.7, 0.0), lrng))
+			core.add_child(_room_light(Vector3(0.0, height - 0.7, 0.0), lrng, lwall))
 		if floors >= 6:
 			# a third mid-tower light for real towers: without it the 6+ storeys between the two
 			# budgeted lights are a black climb (QA: finale ascent happened in the darkest room)
-			core.add_child(_room_light(Vector3(0.0, float(floors) * 0.5 * sh + 2.0, 0.0), maxf(lrng, sh * 1.2)))
+			core.add_child(_room_light(Vector3(0.0, float(floors) * 0.5 * sh + 2.0, 0.0), maxf(lrng, sh * 1.2), lwall))
 
 
 # The swinging door panel per the DOOR NODE CONTRACT: a Node3D LEAF whose origin is the HINGE EDGE
@@ -492,10 +493,36 @@ static func _slab_with_hole(w: float, d: float, t: float, hole: Rect2, mat: Mate
 
 
 # One warm interior room light, inside the pinned budget (max 2 per building, range ~6, no shadows).
-static func _room_light(pos: Vector3, rng: float = 6.0) -> OmniLight3D:
+## THE ROOM LIGHT ADAPTS TO THE ROOM. It used to be one recipe — energy 1.35, range up to 11 m —
+## dropped into every interior ever built, whatever its size and whatever its walls were made of.
+##
+## That is fine in a big stone hall and badly wrong in a small pale one, which is most rooms in
+## most towns. An omni at 1.35 inside a 5 m plaster room puts every surface at the top of the
+## range: the walls go to flat white, and — the part that actually gets reported — so does anyone
+## standing in it. A character lit past the top of the curve has no shading gradient left, so its
+## normal map contributes nothing and a perfectly good model reads as flat, waxy and pasted on.
+## The asset is not the problem; I measured one that was reported as "looking off" and it carried
+## baseColor + metallicRoughness + normal at the right scale with real clips. The light was eating
+## all three. A QA pass had already flagged the same thing from the other end ("interiors blown to
+## near-white") and it was filed as a software-renderer artifact. It is not — it shows on a phone.
+##
+## Two terms, because two things drive it. SIZE: a small room needs far less than a hall, and the
+## range already tracks size so the energy should too. ALBEDO: pale plaster returns most of what it
+## is given and dark timber returns little, so the same light is twice the picture on one as on the
+## other. `wall` is the surface name the building is made of — the same string the materials layer uses.
+static func _room_light(pos: Vector3, rng: float = 6.0, wall := "") -> OmniLight3D:
 	var l := OmniLight3D.new()
 	l.light_color = Color(1.0, 0.87, 0.66)
-	l.light_energy = 1.35
+	# SIZE: 1.35 was tuned on a big room; hold it there and fall away to about half in a small one.
+	var size_k := clampf(inverse_lerp(4.0, 11.0, rng), 0.0, 1.0)
+	var energy := lerpf(0.62, 1.35, size_k)
+	# ALBEDO: how much of it the walls will give back. GSurf knows every preset's base colour, and
+	# a mid-grey (~0.55) is the neutral the old constant was implicitly tuned against.
+	if wall != "":
+		var c := GSurf.albedo_of(wall)
+		var lum := 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b
+		energy *= clampf(0.55 / maxf(lum, 0.12), 0.55, 1.25)
+	l.light_energy = energy
 	l.omni_range = rng
 	l.shadow_enabled = false
 	l.light_specular = 0.25
